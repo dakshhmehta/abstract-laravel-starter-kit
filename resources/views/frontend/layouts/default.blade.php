@@ -108,8 +108,8 @@
 
 		<!-- Javascripts
 		================================================== -->
-		<script src="{{ asset('assets/js/jquery.1.10.2.min.js') }}"></script>
-		<script src="{{ asset('assets/bs3/js/bootstrap.min.js') }}"></script>
+		<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+		<script src="//maxcdn.bootstrapcdn.com/bootstrap/latest/js/bootstrap.min.js"></script>
 
 		@yield('footer')
 	</body>
