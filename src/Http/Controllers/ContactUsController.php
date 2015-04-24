@@ -1,6 +1,6 @@
 <?php namespace Kit\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
 use Validator;
 use View;
 use Redirect;

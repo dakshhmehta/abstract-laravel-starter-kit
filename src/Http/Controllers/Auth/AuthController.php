@@ -3,7 +3,7 @@
 use Sentry;
 use Redirect;
 use View;
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
 use Validator;
 use Session;
 use Lang;
