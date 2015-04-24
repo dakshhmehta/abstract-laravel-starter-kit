@@ -1,4 +1,4 @@
-@extends('frontend/layouts/account')
+@extends('kit::frontend.layouts.account')
 
 {{-- Page title --}}
 @section('title')
@@ -21,28 +21,28 @@ Change your Email
 
 			<!-- New Email -->
 			<div class="form-group{{ $errors->first('email', ' has-error') }}">
-				<label class="col-md-3" for="email">New Email</label>
+				<label class="col-md-3 form-label" for="email">New Email</label>
 				<div class="col-md-9">
 					<input class="form-control" type="text" name="email" id="email" value="" />
-					{{ $errors->first('email', '<span class="help-block">:message</span>') }}
+					{{ $errors->first('email') }}
 				</div>
 			</div>
 
 			<!-- Confirm New Email -->
 			<div class="form-group{{ $errors->first('email_confirm', ' has-error') }}">
-				<label class="col-md-3" for="email_confirm">Confirm New Email</label>
+				<label class="col-md-3 form-label" for="email_confirm">Confirm New Email</label>
 				<div class="col-md-9">
 					<input class="form-control" type="text" name="email_confirm" id="email_confirm" value="" />
-					{{ $errors->first('email_confirm', '<span class="help-block">:message</span>') }}
+					{{ $errors->first('email_confirm') }}
 				</div>
 			</div>
 
 			<!-- Current Password -->
 			<div class="form-group{{ $errors->first('current_password', ' has-error') }}">
-				<label class="col-md-3" for="current_password">Current Password</label>
+				<label class="col-md-3 form-label" for="current_password">Current Password</label>
 				<div class="col-md-9">
 					<input class="form-control" type="password" name="current_password" id="current_password" value="" />
-					{{ $errors->first('current_password', '<span class="help-block">:message</span>') }}
+					{{ $errors->first('current_password') }}
 				</div>
 			</div>
 

@@ -1,4 +1,4 @@
-@extends('frontend/layouts/account')
+@extends('kit::frontend.layouts.account')
 
 {{-- Page title --}}
 @section('title')

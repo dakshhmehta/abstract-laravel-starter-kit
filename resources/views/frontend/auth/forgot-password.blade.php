@@ -1,4 +1,4 @@
-@extends('frontend/layouts/default')
+@extends('kit::frontend.layouts.default')
 
 {{-- Page title --}}
 @section('title')
@@ -27,7 +27,7 @@ Forgot Password ::
 	<!-- Form actions -->
 	<div class="control-group">
 		<div class="controls">
-			<a class="btn" href="{{ route('home') }}">Cancel</a>
+			<a class="btn" href="{{ url('/') }}">Cancel</a>
 
 			<button type="submit" class="btn">Submit</button>
 		</div>

@@ -9,11 +9,11 @@
 |
 */
 
-/*Route::group(array('prefix' => 'admin'), function()
+Route::group(array('prefix' => 'admin'), function()
 {
 
 	# Blog Management
-	Route::group(array('prefix' => 'blogs'), function()
+	/*Route::group(array('prefix' => 'blogs'), function()
 	{
 		Route::get('/', array('as' => 'blogs', 'uses' => 'Kit\Http\Admin\BlogsController@getIndex'));
 		Route::get('create', array('as' => 'create/blog', 'uses' => 'Kit\Http\Admin\BlogsController@getCreate'));
@@ -22,7 +22,7 @@
 		Route::post('{blogId}/edit', 'Controllers\Admin\BlogsController@postEdit');
 		Route::get('{blogId}/delete', array('as' => 'delete/blog', 'uses' => 'Kit\Http\Admin\BlogsController@getDelete'));
 		Route::get('{blogId}/restore', array('as' => 'restore/blog', 'uses' => 'Kit\Http\Admin\BlogsController@getRestore'));
-	});
+	});*/
 
 	# User Management
 	Route::group(array('prefix' => 'users'), function()
@@ -37,7 +37,7 @@
 	});
 
 	# Group Management
-	Route::group(array('prefix' => 'groups'), function()
+	/*Route::group(array('prefix' => 'groups'), function()
 	{
 		Route::get('/', array('as' => 'groups', 'uses' => 'Kit\Http\Admin\GroupsController@getIndex'));
 		Route::get('create', array('as' => 'create/group', 'uses' => 'Kit\Http\Admin\GroupsController@getCreate'));
@@ -46,12 +46,12 @@
 		Route::post('{groupId}/edit', 'Controllers\Admin\GroupsController@postEdit');
 		Route::get('{groupId}/delete', array('as' => 'delete/group', 'uses' => 'Kit\Http\Admin\GroupsController@getDelete'));
 		Route::get('{groupId}/restore', array('as' => 'restore/group', 'uses' => 'Kit\Http\Admin\GroupsController@getRestore'));
-	});
+	});*/
 
 	# Dashboard
 	Route::get('/', array('as' => 'admin', 'uses' => 'Kit\Http\Admin\DashboardController@getIndex'));
 
-});*/
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -98,25 +98,25 @@ Route::group(array('prefix' => 'authenticate'), function()
 |
 */
 
-/*Route::group(array('prefix' => 'account'), function()
+Route::group(array('prefix' => 'account'), function()
 {
 
 	# Account Dashboard
-	Route::get('/', array('as' => 'account', 'uses' => 'Kit\Http\Account\DashboardController@getIndex'));
+	Route::get('/', array('as' => 'account', 'uses' => 'Account\DashboardController@getIndex'));
 
 	# Profile
-	Route::get('profile', array('as' => 'profile', 'uses' => 'Kit\Http\Account\ProfileController@getIndex'));
-	Route::post('profile', 'Controllers\Account\ProfileController@postIndex');
+	Route::get('profile', array('as' => 'profile', 'uses' => 'Account\ProfileController@getIndex'));
+	Route::post('profile', 'Account\ProfileController@postIndex');
 
 	# Change Password
-	Route::get('change-password', array('as' => 'change-password', 'uses' => 'Kit\Http\Account\ChangePasswordController@getIndex'));
-	Route::post('change-password', 'Controllers\Account\ChangePasswordController@postIndex');
+	Route::get('change-password', array('as' => 'change-password', 'uses' => 'Account\ChangePasswordController@getIndex'));
+	Route::post('change-password', 'Account\ChangePasswordController@postIndex');
 
 	# Change Email
-	Route::get('change-email', array('as' => 'change-email', 'uses' => 'Kit\Http\Account\ChangeEmailController@getIndex'));
-	Route::post('change-email', 'Controllers\Account\ChangeEmailController@postIndex');
+	Route::get('change-email', array('as' => 'change-email', 'uses' => 'Account\ChangeEmailController@getIndex'));
+	Route::post('change-email', 'Account\ChangeEmailController@postIndex');
 
-});*/
+});
 
 /*
 |--------------------------------------------------------------------------

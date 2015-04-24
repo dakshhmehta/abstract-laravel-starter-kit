@@ -220,7 +220,7 @@ class AuthController extends Controller {
 	public function getForgotPassword()
 	{
 		// Show the page
-		return View::make('frontend.auth.forgot-password');
+		return View::make('kit::frontend.auth.forgot-password');
 	}
 
 	/**
@@ -257,7 +257,7 @@ class AuthController extends Controller {
 			);
 
 			// Send the activation code through email
-			Mail::send('emails.forgot-password', $data, function($m) use ($user)
+			Mail::send('kit::emails.forgot-password', $data, function($m) use ($user)
 			{
 				$m->to($user->email, $user->first_name . ' ' . $user->last_name);
 				$m->subject('Account Password Recovery');
