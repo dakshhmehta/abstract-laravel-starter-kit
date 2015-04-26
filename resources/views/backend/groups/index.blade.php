@@ -1,4 +1,4 @@
-@extends('backend/layouts/default')
+@extends('kit::backend.layouts.default')
 
 {{-- Web site Title --}}
 @section('title')
@@ -18,16 +18,16 @@ Group Management ::
 	</h3>
 </div>
 
-{{ $groups->links() }}
+{{ $groups->render() }}
 
 <table class="table table-bordered table-striped table-hover">
 	<thead>
 		<tr>
-			<th class="span1">@lang('admin/groups/table.id')</th>
-			<th class="span6">@lang('admin/groups/table.name')</th>
-			<th class="span2">@lang('admin/groups/table.users')</th>
-			<th class="span2">@lang('admin/groups/table.created_at')</th>
-			<th class="span2">@lang('table.actions')</th>
+			<th class="span1">@lang('kit::admin/groups/table.id')</th>
+			<th class="span6">@lang('kit::admin/groups/table.name')</th>
+			<th class="span2">@lang('kit::admin/groups/table.users')</th>
+			<th class="span2">@lang('kit::admin/groups/table.created_at')</th>
+			<th class="span2">@lang('kit::table.actions')</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -39,8 +39,8 @@ Group Management ::
 			<td>{{ $group->users()->count() }}</td>
 			<td>{{ $group->created_at->diffForHumans() }}</td>
 			<td>
-				<a href="{{ route('update/group', $group->id) }}" class="btn btn-mini">@lang('button.edit')</a>
-				<a href="{{ route('delete/group', $group->id) }}" class="btn btn-mini btn-danger">@lang('button.delete')</a>
+				<a href="{{ route('update/group', $group->id) }}" class="btn btn-mini">@lang('kit::button.edit')</a>
+				<a href="{{ route('delete/group', $group->id) }}" class="btn btn-mini btn-danger">@lang('kit::button.delete')</a>
 			</td>
 		</tr>
 		@endforeach
@@ -52,5 +52,5 @@ Group Management ::
 	</tbody>
 </table>
 
-{{ $groups->links() }}
+{{ $groups->render() }}
 @stop

@@ -1,6 +1,6 @@
-<?php namespace Controllers\Admin;
+<?php namespace Kit\Http\Controllers\Admin;
 
-use AdminController;
+use Kit\Http\Controllers\AdminController;
 use Cartalyst\Sentry\Groups\GroupExistsException;
 use Cartalyst\Sentry\Groups\GroupNotFoundException;
 use Cartalyst\Sentry\Groups\NameRequiredException;
@@ -25,7 +25,7 @@ class GroupsController extends AdminController {
 		$groups = Sentry::getGroupProvider()->createModel()->paginate();
 
 		// Show the page
-		return View::make('backend/groups/index', compact('groups'));
+		return View::make('kit::backend.groups.index', compact('groups'));
 	}
 
 	/**
@@ -43,7 +43,7 @@ class GroupsController extends AdminController {
 		$selectedPermissions = Input::old('permissions', array());
 
 		// Show the page
-		return View::make('backend/groups/create', compact('permissions', 'selectedPermissions'));
+		return View::make('kit::backend.groups.create', compact('permissions', 'selectedPermissions'));
 	}
 
 	/**
@@ -83,11 +83,11 @@ class GroupsController extends AdminController {
 			if ($group = Sentry::getGroupProvider()->create($inputs))
 			{
 				// Redirect to the new group page
-				return Redirect::route('update/group', $group->id)->with('success', Lang::get('admin/groups/message.success.create'));
+				return Redirect::route('update/group', $group->id)->with('success', Lang::get('kit::admin/groups/message.success.create'));
 			}
 
 			// Redirect to the new group page
-			return Redirect::route('create/group')->with('error', Lang::get('admin/groups/message.error.create'));
+			return Redirect::route('create/group')->with('error', Lang::get('kit::admin/groups/message.error.create'));
 		}
 		catch (NameRequiredException $e)
 		{
@@ -99,7 +99,7 @@ class GroupsController extends AdminController {
 		}
 
 		// Redirect to the group create page
-		return Redirect::route('create/group')->withInput()->with('error', Lang::get('admin/groups/message.'.$error));
+		return Redirect::route('create/group')->withInput()->with('error', Lang::get('kit::admin/groups/message.'.$error));
 	}
 
 	/**
@@ -127,11 +127,11 @@ class GroupsController extends AdminController {
 		catch (GroupNotFoundException $e)
 		{
 			// Redirect to the groups management page
-			return Redirect::route('groups')->with('error', Lang::get('admin/groups/message.group_not_found', compact('id')));
+			return Redirect::route('groups')->with('error', Lang::get('kit::admin/groups/message.group_not_found', compact('id')));
 		}
 
 		// Show the page
-		return View::make('backend/groups/edit', compact('group', 'permissions', 'groupPermissions'));
+		return View::make('kit::backend.groups.edit', compact('group', 'permissions', 'groupPermissions'));
 	}
 
 	/**
@@ -156,7 +156,7 @@ class GroupsController extends AdminController {
 		catch (GroupNotFoundException $e)
 		{
 			// Redirect to the groups management page
-			return Rediret::route('groups')->with('error', Lang::get('admin/groups/message.group_not_found', compact('id')));
+			return Rediret::route('groups')->with('error', Lang::get('kit::admin/groups/message.group_not_found', compact('id')));
 		}
 
 		// Declare the rules for the form validation
@@ -184,17 +184,17 @@ class GroupsController extends AdminController {
 			if ($group->save())
 			{
 				// Redirect to the group page
-				return Redirect::route('update/group', $id)->with('success', Lang::get('admin/groups/message.success.update'));
+				return Redirect::route('update/group', $id)->with('success', Lang::get('kit::admin/groups/message.success.update'));
 			}
 			else
 			{
 				// Redirect to the group page
-				return Redirect::route('update/group', $id)->with('error', Lang::get('admin/groups/message.error.update'));
+				return Redirect::route('update/group', $id)->with('error', Lang::get('kit::admin/groups/message.error.update'));
 			}
 		}
 		catch (NameRequiredException $e)
 		{
-			$error = Lang::get('admin/group/message.group_name_required');
+			$error = Lang::get('kit::admin/group/message.group_name_required');
 		}
 
 		// Redirect to the group page
@@ -218,12 +218,12 @@ class GroupsController extends AdminController {
 			$group->delete();
 
 			// Redirect to the group management page
-			return Redirect::route('groups')->with('success', Lang::get('admin/groups/message.success.delete'));
+			return Redirect::route('groups')->with('success', Lang::get('kit::admin/groups/message.success.delete'));
 		}
 		catch (GroupNotFoundException $e)
 		{
 			// Redirect to the group management page
-			return Redirect::route('groups')->with('error', Lang::get('admin/groups/message.group_not_found', compact('id')));
+			return Redirect::route('groups')->with('error', Lang::get('kit::admin/groups/message.group_not_found', compact('id')));
 		}
 	}
 
