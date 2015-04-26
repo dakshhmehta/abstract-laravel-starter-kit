@@ -13,27 +13,27 @@ Route::group(array('prefix' => 'admin'), function()
 {
 
 	# Blog Management
-	/*Route::group(array('prefix' => 'blogs'), function()
+	Route::group(array('prefix' => 'blogs'), function()
 	{
-		Route::get('/', array('as' => 'blogs', 'uses' => 'Kit\Http\Admin\BlogsController@getIndex'));
-		Route::get('create', array('as' => 'create/blog', 'uses' => 'Kit\Http\Admin\BlogsController@getCreate'));
-		Route::post('create', 'Controllers\Admin\BlogsController@postCreate');
-		Route::get('{blogId}/edit', array('as' => 'update/blog', 'uses' => 'Kit\Http\Admin\BlogsController@getEdit'));
-		Route::post('{blogId}/edit', 'Controllers\Admin\BlogsController@postEdit');
-		Route::get('{blogId}/delete', array('as' => 'delete/blog', 'uses' => 'Kit\Http\Admin\BlogsController@getDelete'));
-		Route::get('{blogId}/restore', array('as' => 'restore/blog', 'uses' => 'Kit\Http\Admin\BlogsController@getRestore'));
-	});*/
+		Route::get('/', array('as' => 'blogs', 'uses' => 'Admin\BlogsController@getIndex'));
+		Route::get('create', array('as' => 'create/blog', 'uses' => 'Admin\BlogsController@getCreate'));
+		Route::post('create', 'Admin\BlogsController@postCreate');
+		Route::get('{blogId}/edit', array('as' => 'update/blog', 'uses' => 'Admin\BlogsController@getEdit'));
+		Route::post('{blogId}/edit', 'Admin\BlogsController@postEdit');
+		Route::get('{blogId}/delete', array('as' => 'delete/blog', 'uses' => 'Admin\BlogsController@getDelete'));
+		Route::get('{blogId}/restore', array('as' => 'restore/blog', 'uses' => 'Admin\BlogsController@getRestore'));
+	});
 
 	# User Management
 	Route::group(array('prefix' => 'users'), function()
 	{
-		Route::get('/', array('as' => 'users', 'uses' => 'Kit\Http\Admin\UsersController@getIndex'));
-		Route::get('create', array('as' => 'create/user', 'uses' => 'Kit\Http\Admin\UsersController@getCreate'));
-		Route::post('create', 'Controllers\Admin\UsersController@postCreate');
-		Route::get('{userId}/edit', array('as' => 'update/user', 'uses' => 'Kit\Http\Admin\UsersController@getEdit'));
-		Route::post('{userId}/edit', 'Controllers\Admin\UsersController@postEdit');
-		Route::get('{userId}/delete', array('as' => 'delete/user', 'uses' => 'Kit\Http\Admin\UsersController@getDelete'));
-		Route::get('{userId}/restore', array('as' => 'restore/user', 'uses' => 'Kit\Http\Admin\UsersController@getRestore'));
+		Route::get('/', array('as' => 'users', 'uses' => 'Admin\UsersController@getIndex'));
+		Route::get('create', array('as' => 'create/user', 'uses' => 'Admin\UsersController@getCreate'));
+		Route::post('create', 'Admin\UsersController@postCreate');
+		Route::get('{userId}/edit', array('as' => 'update/user', 'uses' => 'Admin\UsersController@getEdit'));
+		Route::post('{userId}/edit', 'Admin\UsersController@postEdit');
+		Route::get('{userId}/delete', array('as' => 'delete/user', 'uses' => 'Admin\UsersController@getDelete'));
+		Route::get('{userId}/restore', array('as' => 'restore/user', 'uses' => 'Admin\UsersController@getRestore'));
 	});
 
 	# Group Management
@@ -49,7 +49,7 @@ Route::group(array('prefix' => 'admin'), function()
 	});*/
 
 	# Dashboard
-	Route::get('/', array('as' => 'admin', 'uses' => 'Kit\Http\Admin\DashboardController@getIndex'));
+	Route::get('/', array('as' => 'admin', 'uses' => 'Admin\DashboardController@getIndex'));
 
 });
 
