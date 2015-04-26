@@ -124,29 +124,29 @@ class UsersController extends AdminController {
 				}
 
 				// Prepare the success message
-				$success = Lang::get('admin/users/message.success.create');
+				$success = Lang::get('kit::admin/users/message.success.create');
 
 				// Redirect to the new user page
 				return Redirect::route('update/user', $user->id)->with('success', $success);
 			}
 
 			// Prepare the error message
-			$error = Lang::get('admin/users/message.error.create');
+			$error = Lang::get('kit::admin/users/message.error.create');
 
 			// Redirect to the user creation page
 			return Redirect::route('create/user')->with('error', $error);
 		}
 		catch (LoginRequiredException $e)
 		{
-			$error = Lang::get('admin/users/message.user_login_required');
+			$error = Lang::get('kit::admin/users/message.user_login_required');
 		}
 		catch (PasswordRequiredException $e)
 		{
-			$error = Lang::get('admin/users/message.user_password_required');
+			$error = Lang::get('kit::admin/users/message.user_password_required');
 		}
 		catch (UserExistsException $e)
 		{
-			$error = Lang::get('admin/users/message.user_exists');
+			$error = Lang::get('kit::admin/users/message.user_exists');
 		}
 
 		// Redirect to the user creation page
@@ -183,7 +183,7 @@ class UsersController extends AdminController {
 		catch (UserNotFoundException $e)
 		{
 			// Prepare the error message
-			$error = Lang::get('admin/users/message.user_not_found', compact('id'));
+			$error = Lang::get('kit::admin/users/message.user_not_found', compact('id'));
 
 			// Redirect to the user management page
 			return Redirect::route('users')->with('error', $error);
@@ -215,7 +215,7 @@ class UsersController extends AdminController {
 		catch (UserNotFoundException $e)
 		{
 			// Prepare the error message
-			$error = Lang::get('admin/users/message.user_not_found', compact('id'));
+			$error = Lang::get('kit::admin/users/message.user_not_found', compact('id'));
 
 			// Redirect to the user management page
 			return Redirect::route('users')->with('error', $error);
@@ -289,18 +289,18 @@ class UsersController extends AdminController {
 			if ($user->save())
 			{
 				// Prepare the success message
-				$success = Lang::get('admin/users/message.success.update');
+				$success = Lang::get('kit::admin/users/message.success.update');
 
 				// Redirect to the user page
 				return Redirect::route('update/user', $id)->with('success', $success);
 			}
 
 			// Prepare the error message
-			$error = Lang::get('admin/users/message.error.update');
+			$error = Lang::get('kit::admin/users/message.error.update');
 		}
 		catch (LoginRequiredException $e)
 		{
-			$error = Lang::get('admin/users/message.user_login_required');
+			$error = Lang::get('kit::admin/users/message.user_login_required');
 		}
 
 		// Redirect to the user page
@@ -324,7 +324,7 @@ class UsersController extends AdminController {
 			if ($user->id === Sentry::getId())
 			{
 				// Prepare the error message
-				$error = Lang::get('admin/users/message.error.delete');
+				$error = Lang::get('kit::admin/users/message.error.delete');
 
 				// Redirect to the user management page
 				return Redirect::route('users')->with('error', $error);
@@ -341,7 +341,7 @@ class UsersController extends AdminController {
 			$user->delete();
 
 			// Prepare the success message
-			$success = Lang::get('admin/users/message.success.delete');
+			$success = Lang::get('kit::admin/users/message.success.delete');
 
 			// Redirect to the user management page
 			return Redirect::route('users')->with('success', $success);
@@ -349,7 +349,7 @@ class UsersController extends AdminController {
 		catch (UserNotFoundException $e)
 		{
 			// Prepare the error message
-			$error = Lang::get('admin/users/message.user_not_found', compact('id' ));
+			$error = Lang::get('kit::admin/users/message.user_not_found', compact('id' ));
 
 			// Redirect to the user management page
 			return Redirect::route('users')->with('error', $error);
@@ -373,7 +373,7 @@ class UsersController extends AdminController {
 			$user->restore();
 
 			// Prepare the success message
-			$success = Lang::get('admin/users/message.success.restored');
+			$success = Lang::get('kit::admin/users/message.success.restored');
 
 			// Redirect to the user management page
 			return Redirect::route('users')->with('success', $success);
@@ -381,7 +381,7 @@ class UsersController extends AdminController {
 		catch (UserNotFoundException $e)
 		{
 			// Prepare the error message
-			$error = Lang::get('admin/users/message.user_not_found', compact('id'));
+			$error = Lang::get('kit::admin/users/message.user_not_found', compact('id'));
 
 			// Redirect to the user management page
 			return Redirect::route('users')->with('error', $error);

@@ -20,6 +20,7 @@ class KitServiceProvider extends ServiceProvider {
 	 */
 	public function boot(Router $router)
 	{
+		// Routes
 		$router->group(['namespace' => 'Kit\Http\Controllers'], function($router)
 		{
 			require __DIR__.'/../Http/routes.php';
@@ -42,6 +43,12 @@ class KitServiceProvider extends ServiceProvider {
 		$this->publishes([
 	    	__DIR__.'/../../database/seeds/' => database_path('/seeds')
 		], 'seeds');
+
+		#Configs
+		$this->publishes([
+	    	__DIR__.'/../../config/' => config_path()
+		], 'config');
+		
 	}
 
 	/**

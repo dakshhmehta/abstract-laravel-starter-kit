@@ -1,4 +1,4 @@
-@extends('backend/layouts/default')
+@extends('kit::backend.layouts.default')
 
 {{-- Page title --}}
 @section('title')
@@ -33,67 +33,67 @@ Create a User ::
 		<!-- General tab -->
 		<div class="tab-pane active" id="tab-general">
 			<!-- First Name -->
-			<div class="control-group {{ $errors->has('first_name') ? 'error' : '' }}">
-				<label class="control-label" for="first_name">First Name</label>
-				<div class="controls">
-					<input type="text" name="first_name" id="first_name" value="{{ Input::old('first_name') }}" />
-					{{ $errors->first('first_name', '<span class="help-inline">:message</span>') }}
+			<div class="form-group {{ $errors->has('first_name') ? 'has-error' : '' }}">
+				<label class="control-label col-md-3" for="first_name">First Name</label>
+				<div class="col-md-9">
+					<input class="form-control" type="text" name="first_name" id="first_name" value="{{ Input::old('first_name') }}" />
+					{{ $errors->first('first_name') }}
 				</div>
 			</div>
 
 			<!-- Last Name -->
-			<div class="control-group {{ $errors->has('last_name') ? 'error' : '' }}">
-				<label class="control-label" for="last_name">Last Name</label>
-				<div class="controls">
-					<input type="text" name="last_name" id="last_name" value="{{ Input::old('last_name') }}" />
-					{{ $errors->first('last_name', '<span class="help-inline">:message</span>') }}
+			<div class="form-group {{ $errors->has('last_name') ? 'has-error' : '' }}">
+				<label class="control-label col-md-3" for="last_name">Last Name</label>
+				<div class="col-md-9">
+					<input class="form-control" type="text" name="last_name" id="last_name" value="{{ Input::old('last_name') }}" />
+					{{ $errors->first('last_name') }}
 				</div>
 			</div>
 
 			<!-- Email -->
-			<div class="control-group {{ $errors->has('email') ? 'error' : '' }}">
-				<label class="control-label" for="email">Email</label>
-				<div class="controls">
-					<input type="text" name="email" id="email" value="{{ Input::old('email') }}" />
-					{{ $errors->first('email', '<span class="help-inline">:message</span>') }}
+			<div class="form-group {{ $errors->has('email') ? 'has-error' : '' }}">
+				<label class="control-label col-md-3" for="email">Email</label>
+				<div class="col-md-9">
+					<input class="form-control" type="text" name="email" id="email" value="{{ Input::old('email') }}" />
+					{{ $errors->first('email') }}
 				</div>
 			</div>
 
 			<!-- Password -->
-			<div class="control-group {{ $errors->has('password') ? 'error' : '' }}">
-				<label class="control-label" for="password">Password</label>
-				<div class="controls">
-					<input type="password" name="password" id="password" value="" />
-					{{ $errors->first('password', '<span class="help-inline">:message</span>') }}
+			<div class="form-group {{ $errors->has('password') ? 'has-error' : '' }}">
+				<label class="control-label col-md-3" for="password">Password</label>
+				<div class="col-md-9">
+					<input type="password" class="form-control" name="password" id="password" value="" />
+					{{ $errors->first('password') }}
 				</div>
 			</div>
 
 			<!-- Password Confirm -->
-			<div class="control-group {{ $errors->has('password_confirm') ? 'error' : '' }}">
-				<label class="control-label" for="password_confirm">Confirm Password</label>
-				<div class="controls">
-					<input type="password" name="password_confirm" id="password_confirm" value="" />
-					{{ $errors->first('password_confirm', '<span class="help-inline">:message</span>') }}
+			<div class="form-group {{ $errors->has('password_confirm') ? 'has-error' : '' }}">
+				<label class="control-label col-md-3" for="password_confirm">Confirm Password</label>
+				<div class="col-md-9">
+					<input type="password" class="form-control" name="password_confirm" id="password_confirm" value="" />
+					{{ $errors->first('password_confirm') }}
 				</div>
 			</div>
 
 			<!-- Activation Status -->
-			<div class="control-group {{ $errors->has('activated') ? 'error' : '' }}">
-				<label class="control-label" for="activated">User Activated</label>
-				<div class="controls">
+			<div class="form-group {{ $errors->has('activated') ? 'has-error' : '' }}">
+				<label class="control-label col-md-3" for="activated">User Activated</label>
+				<div class="col-md-9">
 					<select name="activated" id="activated">
-						<option value="1"{{ (Input::old('activated', 0) === 1 ? ' selected="selected"' : '') }}>@lang('general.yes')</option>
-						<option value="0"{{ (Input::old('activated', 0) === 0 ? ' selected="selected"' : '') }}>@lang('general.no')</option>
+						<option value="1"{{ (Input::old('activated', 0) === 1 ? ' selected="selected"' : '') }}>@lang('kit::general.yes')</option>
+						<option value="0"{{ (Input::old('activated', 0) === 0 ? ' selected="selected"' : '') }}>@lang('kit::general.no')</option>
 					</select>
-					{{ $errors->first('activated', '<span class="help-inline">:message</span>') }}
+					{{ $errors->first('activated') }}
 				</div>
 			</div>
 
 			<!-- Groups -->
-			<div class="control-group {{ $errors->has('groups') ? 'error' : '' }}">
-				<label class="control-label" for="groups">Groups</label>
-				<div class="controls">
-					<select name="groups[]" id="groups[]" multiple="multiple">
+			<div class="form-group {{ $errors->has('groups') ? 'has-error' : '' }}">
+				<label class="control-label col-md-3" for="groups">Groups</label>
+				<div class="col-md-9">
+					<select class="form-control" name="groups[]" id="groups[]" multiple="multiple">
 						@foreach ($groups as $group)
 						<option value="{{ $group->id }}"{{ (in_array($group->id, $selectedGroups) ? ' selected="selected"' : '') }}>{{ $group->name }}</option>
 						@endforeach
@@ -108,16 +108,16 @@ Create a User ::
 
 		<!-- Permissions tab -->
 		<div class="tab-pane" id="tab-permissions">
-			<div class="control-group">
-				<div class="controls">
+			<div class="form-group">
+				<div class="col-md-9">
 
 					@foreach ($permissions as $area => $permissions)
 					<fieldset>
 						<legend>{{ $area }}</legend>
 
 						@foreach ($permissions as $permission)
-						<div class="control-group">
-							<label class="control-group">{{ $permission['label'] }}</label>
+						<div class="form-group">
+							<label class="form-group">{{ $permission['label'] }}</label>
 
 							<div class="radio inline">
 								<label for="{{ $permission['permission'] }}_allow" onclick="">
@@ -153,8 +153,8 @@ Create a User ::
 	</div>
 
 	<!-- Form Actions -->
-	<div class="control-group">
-		<div class="controls">
+	<div class="form-group">
+		<div class="col-md-9">
 			<a class="btn btn-link" href="{{ route('users') }}">Cancel</a>
 
 			<button type="reset" class="btn">Reset</button>
