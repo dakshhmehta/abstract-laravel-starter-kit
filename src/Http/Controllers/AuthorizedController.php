@@ -1,8 +1,6 @@
 <?php namespace Kit\Http\Controllers;
 
-use Illuminate\Routing\Controller;
-
-class AuthorizedController extends Controller {
+class AuthorizedController extends BaseController {
 
 	/**
 	 * Whitelisted auth routes.

@@ -20,20 +20,20 @@ Account Sign in ::
 					<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 
 					<!-- Email -->
-					<div class="form-group{{ $errors->first('email', ' error') }}">
-						<label class="col-md-3" for="email">Email</label>
+					<div class="form-group{{ $errors->first('email', ' has-error') }}">
+						<label class="col-md-3 control-label" for="email">Email</label>
 						<div class="col-md-9">
 							<input type="text" name="email" id="email" value="{{ Input::old('email') }}" class="form-control" />
-							{{ $errors->first('email', '<span class="help-block">:message</span>') }}
+							{!! $errors->first('email', '<span class="help-block">:message</span>') !!}
 						</div>
 					</div>
 
 					<!-- Password -->
-					<div class="form-group{{ $errors->first('password', ' error') }}">
-						<label class="col-md-3" for="password">Password</label>
+					<div class="form-group{{ $errors->first('password', ' has-error') }}">
+						<label class="col-md-3 control-label" for="password">Password</label>
 						<div class="col-md-9">
 							<input type="password" name="password" id="password" value="" class="form-control" />
-							{{ $errors->first('password', '<span class="help-block">:message</span>') }}
+							{!! $errors->first('password', '<span class="help-block">:message</span>') !!}
 						</div>
 					</div>
 

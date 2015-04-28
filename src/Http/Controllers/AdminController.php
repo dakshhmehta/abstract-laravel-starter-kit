@@ -11,6 +11,8 @@ class AdminController extends AuthorizedController {
 	{
 		// Apply the admin auth filter
 		$this->middleware('admin');
+
+		parent::__construct();
 	}
 
 

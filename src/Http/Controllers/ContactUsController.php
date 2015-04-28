@@ -1,12 +1,11 @@
 <?php namespace Kit\Http\Controllers;
 
-use Illuminate\Routing\Controller;
 use Validator;
 use View;
 use Redirect;
 use Input;
 
-class ContactUsController extends Controller {
+class ContactUsController extends BaseController {
 
 	/**
 	 * Contact us page.
