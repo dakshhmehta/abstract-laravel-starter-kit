@@ -3,6 +3,7 @@
 use Illuminate\Routing\Controller;
 use Illuminate\Support\MessageBag;
 use Sentry;
+use Kit\Models\User;
 
 class BaseController extends Controller {
 
