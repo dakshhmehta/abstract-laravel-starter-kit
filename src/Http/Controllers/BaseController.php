@@ -2,6 +2,7 @@
 
 use Illuminate\Routing\Controller;
 use Illuminate\Support\MessageBag;
+use Sentry;
 
 class BaseController extends Controller {
 
