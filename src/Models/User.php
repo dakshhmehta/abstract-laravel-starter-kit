@@ -1,11 +1,11 @@
 <?php namespace Kit\Models;
 
 use Cartalyst\Sentry\Users\Eloquent\User as SentryUserModel;
-use Illuminate\Database\Eloquent\SoftDeletingTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends SentryUserModel {
 
-	use SoftDeletingTrait;
+	use SoftDeletes;
 
     protected $dates = ['deleted_at'];
 
