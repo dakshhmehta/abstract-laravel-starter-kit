@@ -81,8 +81,8 @@ Route::group(array('prefix' => 'authenticate'), function()
 	Route::post('forgot-password', 'Auth\AuthController@postForgotPassword');
 
 	# Forgot Password Confirmation
-	Route::get('forgot-password/{passwordResetCode}', array('as' => 'forgot-password-confirm', 'uses' => 'Auth\AuthController@getForgotPasswordConfirm'));
-	Route::post('forgot-password/{passwordResetCode}', 'Auth\AuthController@postForgotPasswordConfirm');
+	Route::get('forgot-password/{passwordResetCode}/{userId}', array('as' => 'forgot-password-confirm', 'uses' => 'Auth\AuthController@getForgotPasswordConfirm'));
+	Route::post('forgot-password/{passwordResetCode}/{userId}', 'Auth\AuthController@postForgotPasswordConfirm');
 
 	# Logout
 	Route::get('logout', array('as' => 'logout', 'uses' => 'Auth\AuthController@getLogout'));

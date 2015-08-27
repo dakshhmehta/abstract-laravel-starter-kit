@@ -11,6 +11,7 @@ use Mail;
 use Input;
 use URL;
 use Activation;
+use Reminder;
 
 class AuthController extends BaseController {
 
@@ -250,12 +251,14 @@ class AuthController extends BaseController {
 		try
 		{
 			// Get the user password recovery code
-			$user = Sentinel::getUserRepository()->findByLogin(Input::get('email'));
+			$user = Sentinel::getUserRepository()->where('email', Input::get('email'))->firstOrFail();
+
+			$reminder = Reminder::create($user);
 
 			// Data to be used on the email view
 			$data = array(
 				'user'              => $user,
-				'forgotPasswordUrl' => URL::route('forgot-password-confirm', $user->getResetPasswordCode()),
+				'forgotPasswordUrl' => URL::route('forgot-password-confirm', [$reminder->code, $user->id]),
 			);
 
 			// Send the activation code through email
@@ -280,14 +283,19 @@ class AuthController extends BaseController {
 	 * Forgot Password Confirmation page.
 	 *
 	 * @param  string  $passwordResetCode
+	 * @param  integer $userId ID of the user
 	 * @return View
 	 */
-	public function getForgotPasswordConfirm($passwordResetCode = null)
+	public function getForgotPasswordConfirm($passwordResetCode = null, $userId = null)
 	{
 		try
 		{
-			// Find the user using the password reset code
-			$user = Sentinel::getUserRepository()->findByResetPasswordCode($passwordResetCode);
+			// Find the user
+			$user = Sentinel::getUserRepository()->findById($userId);
+
+			// Show the page if user has requested a forget password
+			if(Reminder::exists($user))
+				return View::make('kit::frontend.auth.forgot-password-confirm');
 		}
 		catch(\Cartalyst\Sentinel\Users\UserNotFoundException $e)
 		{
@@ -295,8 +303,6 @@ class AuthController extends BaseController {
 			return Redirect::route('forgot-password')->with('error', Lang::get('kit::auth/message.account_not_found'));
 		}
 
-		// Show the page
-		return View::make('kit::frontend.auth.forgot-password-confirm');
 	}
 
 	/**
@@ -305,7 +311,7 @@ class AuthController extends BaseController {
 	 * @param  string  $passwordResetCode
 	 * @return Redirect
 	 */
-	public function postForgotPasswordConfirm($passwordResetCode = null)
+	public function postForgotPasswordConfirm($passwordResetCode = null, $userId = null)
 	{
 		// Declare the rules for the form validation
 		$rules = array(
@@ -326,10 +332,10 @@ class AuthController extends BaseController {
 		try
 		{
 			// Find the user using the password reset code
-			$user = Sentinel::getUserRepository()->findByResetPasswordCode($passwordResetCode);
+			$user = Sentinel::getUserRepository()->findById($userId);
 
 			// Attempt to reset the user password
-			if ($user->attemptResetPassword($passwordResetCode, Input::get('password')))
+			if (Reminder::exists($user) and Reminder::complete($user, $passwordResetCode, Input::get('password')))
 			{
 				// Password successfully reseted
 				return Redirect::route('signin')->with('success', Lang::get('kit::auth/message.forgot-password-confirm.success'));
