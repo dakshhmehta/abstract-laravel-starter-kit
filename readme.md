@@ -21,7 +21,7 @@ In order to instal this package, just like other package you install - add a ser
 'Kit\Providers\KitServiceProvider'
 ```
 
-Additional to that, the package utilize the sentry and therefore add service provider and alias of the same as well. You can [follow this](https://cartalyst.com/manual/sentry#laravel-4) to install Sentry.
+Additional to that, the package utilize the Sentinel and therefore add service provider and alias of the same as well. You can [follow this](https://cartalyst.com/manual/sentinel/2.0#installation) to install.
 
 The Kit comes with installation command that does all the job you need to perform while setting up a new project. But before that, prepare the database and an enviorment file to get started and execute following command on terminal.
 
