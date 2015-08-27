@@ -3,7 +3,7 @@
 use Kit\Http\Controllers\AuthorizedController;
 use Input;
 use Redirect;
-use Sentry;
+use Sentinel;
 use Validator;
 use View;
 
@@ -17,7 +17,7 @@ class ChangeEmailController extends AuthorizedController {
 	public function getIndex()
 	{
 		// Get the user information
-		$user = Sentry::getUser();
+		$user = Sentinel::getUser();
 
 		// Show the page
 		return View::make('kit::frontend.account.change-email', compact('user'));
@@ -33,7 +33,7 @@ class ChangeEmailController extends AuthorizedController {
 		// Declare the rules for the form validation
 		$rules = array(
 			'current_password' => 'required|between:3,32',
-			'email'            => 'required|email|unique:users,email,'.Sentry::getUser()->email.',email',
+			'email'            => 'required|email|unique:users,email,'.Sentinel::getUser()->email.',email',
 			'email_confirm'    => 'required|same:email',
 		);
 
@@ -48,10 +48,10 @@ class ChangeEmailController extends AuthorizedController {
 		}
 
 		// Grab the user
-		$user = Sentry::getUser();
+		$user = Sentinel::getUser();
 
 		// Check the user current password
-		if ( ! $user->checkPassword(Input::get('current_password')))
+		if ( ! Sentinel::validateCredentials($user, ['password' => Input::get('current_password')]))
 		{
 			// Set the error message
 			$this->messageBag->add('current_password', 'Your current password is incorrect');
@@ -61,8 +61,7 @@ class ChangeEmailController extends AuthorizedController {
 		}
 
 		// Update the user email
-		$user->email = Input::get('email');
-		$user->save();
+		Sentinel::update($user, ['email' => Input::get('email')]);
 
 		// Redirect to the settings page
 		return Redirect::route('change-email')->with('success', 'Email successfully updated');

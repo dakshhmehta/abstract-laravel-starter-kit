@@ -3,7 +3,7 @@
 use Kit\Http\Controllers\AuthorizedController;
 use Input;
 use Redirect;
-use Sentry;
+use Sentinel;
 use Validator;
 use View;
 
@@ -17,7 +17,7 @@ class ChangePasswordController extends AuthorizedController {
 	public function getIndex()
 	{
 		// Get the user information
-		$user = Sentry::getUser();
+		$user = Sentinel::getUser();
 
 		// Show the page
 		return View::make('kit::frontend.account.change-password', compact('user'));
@@ -48,10 +48,10 @@ class ChangePasswordController extends AuthorizedController {
 		}
 
 		// Grab the user
-		$user = Sentry::getUser();
+		$user = Sentinel::getUser();
 
 		// Check the user current password
-		if ( ! $user->checkPassword(Input::get('old_password')))
+		if ( ! Sentinel::validateCredentials($user, ['password' => Input::get('old_password')]))
 		{
 			// Set the error message
 			$this->messageBag->add('old_password', 'Your current password is incorrect.');
@@ -61,8 +61,7 @@ class ChangePasswordController extends AuthorizedController {
 		}
 
 		// Update the user password
-		$user->password = Input::get('password');
-		$user->save();
+		Sentinel::update($user, ['password' => Input::get('password')]);
 
 		// Redirect to the change-password page
 		return Redirect::route('change-password')->with('success', 'Password successfully updated');

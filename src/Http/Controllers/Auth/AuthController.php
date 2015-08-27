@@ -1,17 +1,18 @@
 <?php namespace Kit\Http\Controllers\Auth;
 
+use Activation;
+use Cartalyst\Sentinel\Checkpoints\ThrottlingException;
+use Input;
 use Kit\Http\Controllers\BaseController;
-use Sentinel;
-use Redirect;
-use View;
-use Validator;
-use Session;
 use Lang;
 use Mail;
-use Input;
-use URL;
-use Activation;
+use Redirect;
 use Reminder;
+use Sentinel;
+use Session;
+use URL;
+use Validator;
+use View;
 
 class AuthController extends BaseController {
 
@@ -55,10 +56,13 @@ class AuthController extends BaseController {
 			return Redirect::back()->withInput()->withErrors($validator);
 		}
 
-		try
-		{
+		try {
 			// Try to log the user in
-			Sentinel::authenticate(Input::only('email', 'password'), Input::get('remember-me', 0));
+			$user = Sentinel::authenticate(Input::only('email', 'password'), Input::get('remember-me', 0));
+
+			if($user == false){
+				return Redirect::back()->with('error', Lang::get('kit::auth/message.signin.error'));
+			}
 
 			// Get the page we were before
 			$redirect = Session::get('loginRedirect', 'account');
@@ -69,21 +73,9 @@ class AuthController extends BaseController {
 			// Redirect to the users page
 			return Redirect::to($redirect)->with('success', Lang::get('kit::auth/message.signin.success'));
 		}
-		catch (\Cartalyst\Sentinel\Users\UserNotFoundException $e)
+		catch (ThrottlingException $e)
 		{
-			$this->messageBag->add('email', Lang::get('kit::auth/message.account_not_found'));
-		}
-		catch (\Cartalyst\Sentinel\Users\UserNotActivatedException $e)
-		{
-			$this->messageBag->add('email', Lang::get('kit::auth/message.account_not_activated'));
-		}
-		catch (\Cartalyst\Sentinel\Throttling\UserSuspendedException $e)
-		{
-			$this->messageBag->add('email', Lang::get('kit::auth/message.account_suspended'));
-		}
-		catch (\Cartalyst\Sentinel\Throttling\UserBannedException $e)
-		{
-			$this->messageBag->add('email', Lang::get('kit::auth/message.account_banned'));
+			return Redirect::back()->with('error', $e->getMessage());
 		}
 
 		// Ooops.. something went wrong

@@ -1,9 +1,11 @@
 <?php namespace Kit\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Sentinel;
+use Activation;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class AppInstallCommand extends Command {
 
@@ -249,7 +251,6 @@ class AppInstallCommand extends Command {
 	{
 		// Prepare the user data array.
 		$data = array_merge($this->userData, array(
-			'activated'   => 1,
 			'permissions' => array(
 				'admin' => 1,
 				'user'  => 1,
@@ -262,6 +263,14 @@ class AppInstallCommand extends Command {
 		// Associate the Admin group to this user
 		$group = Sentinel::getRoleRepository()->findById(1);
 		$group->users()->attach($user);
+
+		// Activate the user
+		$activation = Activation::create($user);
+		$activation->fill([
+            'completed'    => true,
+            'completed_at' => Carbon::now(),
+        ]);
+        $activation->save();
 
 		// Show the success message
 		$this->comment('');

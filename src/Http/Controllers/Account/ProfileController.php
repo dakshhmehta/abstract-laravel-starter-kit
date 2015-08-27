@@ -3,7 +3,7 @@
 use Kit\Http\Controllers\AuthorizedController;
 use Input;
 use Redirect;
-use Sentry;
+use Sentinel;
 use Validator;
 use View;
 
@@ -17,7 +17,7 @@ class ProfileController extends AuthorizedController {
 	public function getIndex()
 	{
 		// Get the user information
-		$user = Sentry::getUser();
+		$user = Sentinel::getUser();
 
 		// Show the page
 		return View::make('kit::frontend.account.profile', compact('user'));
@@ -49,7 +49,7 @@ class ProfileController extends AuthorizedController {
 		}
 
 		// Grab the user
-		$user = Sentry::getUser();
+		$user = Sentinel::getUser();
 
 		// Update the user information
 		$user->first_name = Input::get('first_name');
