@@ -74,7 +74,7 @@ Route::group(array('prefix' => 'authenticate'), function()
 	Route::post('signup', 'Auth\AuthController@postSignup');
 
 	# Account Activation
-	Route::get('activate/{activationCode}', array('as' => 'activate', 'uses' => 'Auth\AuthController@getActivate'));
+	Route::get('activate/{activationCode}/{userId}', array('as' => 'activate', 'uses' => 'Auth\AuthController@getActivate'));
 
 	# Forgot Password
 	Route::get('forgot-password', array('as' => 'forgot-password', 'uses' => 'Auth\AuthController@getForgotPassword'));

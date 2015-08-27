@@ -3,7 +3,7 @@
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Sentry;
+use Sentinel;
 
 class AppInstallCommand extends Command {
 
@@ -212,13 +212,10 @@ class AppInstallCommand extends Command {
 	protected function sentryRunner()
 	{
 		// Create the default groups
-		$this->sentryCreateDefaultGroups();
+		$this->sentinelCreateDefaultGroups();
 
 		// Create the user
-		$this->sentryCreateUser();
-
-		// Create dummy user
-		$this->sentryCreateDummyUser();
+		$this->sentinelCreateUser();
 	}
 
 	/**
@@ -226,27 +223,21 @@ class AppInstallCommand extends Command {
 	 *
 	 * @return void
 	 */
-	protected function sentryCreateDefaultGroups()
+	protected function sentinelCreateDefaultGroups()
 	{
-		try
-		{
-			// Create the admin group
-			$group = Sentry::getGroupProvider()->create(array(
-				'name'        => 'Admin',
-				'permissions' => array(
-					'admin' => 1,
-					'users' => 1
-				)
-			));
+		// Create the admin group
+		$group = Sentinel::getRoleRepository()->createModel()->create(array(
+			'name'        => 'Admin',
+			'slug'			=> 'admin',
+			'permissions' => array(
+				'admin' => 1,
+				'users' => 1
+			)
+		));
 
-			// Show the success message.
-			$this->comment('');
-			$this->info('Admin group created successfully.');
-		}
-		catch (Cartalyst\Sentry\Groups\GroupExistsException $e)
-		{
-			$this->error('Group already exists.');
-		}
+		// Show the success message.
+		$this->comment('');
+		$this->info('Admin group created successfully.');
 	}
 
 	/**
@@ -254,7 +245,7 @@ class AppInstallCommand extends Command {
 	 *
 	 * @return void
 	 */
-	protected function sentryCreateUser()
+	protected function sentinelCreateUser()
 	{
 		// Prepare the user data array.
 		$data = array_merge($this->userData, array(
@@ -266,36 +257,15 @@ class AppInstallCommand extends Command {
 		));
 
 		// Create the user
-		$user = Sentry::getUserProvider()->create($data);
+		$user = Sentinel::getUserRepository()->create($data);
 
 		// Associate the Admin group to this user
-		$group = Sentry::getGroupProvider()->findById(1);
-		$user->addGroup($group);
+		$group = Sentinel::getRoleRepository()->findById(1);
+		$group->users()->attach($user);
 
 		// Show the success message
 		$this->comment('');
 		$this->info('Your user was created successfully.');
 		$this->comment('');
 	}
-
-	/**
-	 * Create a dummy user.
-	 *
-	 * @return void
-	 */
-	protected function sentryCreateDummyUser()
-	{
-		// Prepare the user data array.
-		$data = array(
-			'first_name' => 'John',
-			'last_name'  => 'Doe',
-			'email'      => 'john.doe@example.com',
-			'password'   => 'johndoe',
-			'activated'  => 1,
-		);
-
-		// Create the user
-		Sentry::getUserProvider()->create($data);
-	}
-
 }

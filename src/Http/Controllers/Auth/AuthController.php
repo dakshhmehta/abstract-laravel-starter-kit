@@ -1,7 +1,7 @@
 <?php namespace Kit\Http\Controllers\Auth;
 
 use Kit\Http\Controllers\BaseController;
-use Sentry;
+use Sentinel;
 use Redirect;
 use View;
 use Validator;
@@ -10,6 +10,7 @@ use Lang;
 use Mail;
 use Input;
 use URL;
+use Activation;
 
 class AuthController extends BaseController {
 
@@ -21,7 +22,7 @@ class AuthController extends BaseController {
 	public function getSignin()
 	{
 		// Is the user logged in?
-		if (Sentry::check())
+		if (Sentinel::check())
 		{
 			return Redirect::route('account');
 		}
@@ -56,7 +57,7 @@ class AuthController extends BaseController {
 		try
 		{
 			// Try to log the user in
-			Sentry::authenticate(Input::only('email', 'password'), Input::get('remember-me', 0));
+			Sentinel::authenticate(Input::only('email', 'password'), Input::get('remember-me', 0));
 
 			// Get the page we were before
 			$redirect = Session::get('loginRedirect', 'account');
@@ -67,19 +68,19 @@ class AuthController extends BaseController {
 			// Redirect to the users page
 			return Redirect::to($redirect)->with('success', Lang::get('kit::auth/message.signin.success'));
 		}
-		catch (\Cartalyst\Sentry\Users\UserNotFoundException $e)
+		catch (\Cartalyst\Sentinel\Users\UserNotFoundException $e)
 		{
 			$this->messageBag->add('email', Lang::get('kit::auth/message.account_not_found'));
 		}
-		catch (\Cartalyst\Sentry\Users\UserNotActivatedException $e)
+		catch (\Cartalyst\Sentinel\Users\UserNotActivatedException $e)
 		{
 			$this->messageBag->add('email', Lang::get('kit::auth/message.account_not_activated'));
 		}
-		catch (\Cartalyst\Sentry\Throttling\UserSuspendedException $e)
+		catch (\Cartalyst\Sentinel\Throttling\UserSuspendedException $e)
 		{
 			$this->messageBag->add('email', Lang::get('kit::auth/message.account_suspended'));
 		}
-		catch (\Cartalyst\Sentry\Throttling\UserBannedException $e)
+		catch (\Cartalyst\Sentinel\Throttling\UserBannedException $e)
 		{
 			$this->messageBag->add('email', Lang::get('kit::auth/message.account_banned'));
 		}
@@ -96,7 +97,7 @@ class AuthController extends BaseController {
 	public function getSignup()
 	{
 		// Is the user logged in?
-		if (Sentry::check())
+		if (Sentinel::check())
 		{
 			return Redirect::route('account');
 		}
@@ -135,17 +136,19 @@ class AuthController extends BaseController {
 		try
 		{
 			// Register the user
-			$user = Sentry::register(array(
+			$user = Sentinel::register(array(
 				'first_name' => Input::get('first_name'),
 				'last_name'  => Input::get('last_name'),
 				'email'      => Input::get('email'),
 				'password'   => Input::get('password'),
 			));
 
+			$activation = Activation::create($user);
+
 			// Data to be used on the email view
 			$data = array(
 				'user'          => $user,
-				'activationUrl' => URL::route('activate', $user->getActivationCode()),
+				'activationUrl' => URL::route('activate', [$activation->getCode(), $user->id]),
 			);
 
 			// Send the activation code through email
@@ -158,14 +161,13 @@ class AuthController extends BaseController {
 			}
 			catch(\Swift_TransportException $e)
 			{
-				$user->activated = 1;
-				$user->save();
+				Activation::complete($user, $activation->getCode());
 			}
 
 			// Redirect to the register page
-			return Redirect::back()->with('success', Lang::get('kit::auth/message.signup.success'));
+			return Redirect::route('signin')->with('success', Lang::get('kit::auth/message.signup.success'));
 		}
-		catch (\Cartalyst\Sentry\Users\UserExistsException $e)
+		catch (\Cartalyst\Sentinel\Users\UserExistsException $e)
 		{
 			$this->messageBag->add('email', Lang::get('kit::auth/message.account_already_exists'));
 		}
@@ -180,10 +182,10 @@ class AuthController extends BaseController {
 	 * @param  string  $actvationCode
 	 * @return
 	 */
-	public function getActivate($activationCode = null)
+	public function getActivate($activationCode = null, $userId = null)
 	{
 		// Is the user logged in?
-		if (Sentry::check())
+		if (Sentinel::check())
 		{
 			return Redirect::route('account');
 		}
@@ -191,10 +193,10 @@ class AuthController extends BaseController {
 		try
 		{
 			// Get the user we are trying to activate
-			$user = Sentry::getUserProvider()->findByActivationCode($activationCode);
+			$user = Sentinel::getUserRepository()->findById($userId);
 
 			// Try to activate this user account
-			if ($user->attemptActivation($activationCode))
+			if (Activation::complete($user, $activationCode))
 			{
 				// Redirect to the login page
 				return Redirect::route('signin')->with('success', Lang::get('kit::auth/message.activate.success'));
@@ -203,7 +205,7 @@ class AuthController extends BaseController {
 			// The activation failed.
 			$error = Lang::get('kit::auth/message.activate.error');
 		}
-		catch (\Cartalyst\Sentry\Users\UserNotFoundException $e)
+		catch (\Cartalyst\Sentinel\Users\UserNotFoundException $e)
 		{
 			$error = Lang::get('kit::auth/message.activate.error');
 		}
@@ -248,7 +250,7 @@ class AuthController extends BaseController {
 		try
 		{
 			// Get the user password recovery code
-			$user = Sentry::getUserProvider()->findByLogin(Input::get('email'));
+			$user = Sentinel::getUserRepository()->findByLogin(Input::get('email'));
 
 			// Data to be used on the email view
 			$data = array(
@@ -263,7 +265,7 @@ class AuthController extends BaseController {
 				$m->subject('Account Password Recovery');
 			});
 		}
-		catch (\Cartalyst\Sentry\Users\UserNotFoundException $e)
+		catch (\Cartalyst\Sentinel\Users\UserNotFoundException $e)
 		{
 			// Even though the email was not found, we will pretend
 			// we have sent the password reset code through email,
@@ -285,9 +287,9 @@ class AuthController extends BaseController {
 		try
 		{
 			// Find the user using the password reset code
-			$user = Sentry::getUserProvider()->findByResetPasswordCode($passwordResetCode);
+			$user = Sentinel::getUserRepository()->findByResetPasswordCode($passwordResetCode);
 		}
-		catch(\Cartalyst\Sentry\Users\UserNotFoundException $e)
+		catch(\Cartalyst\Sentinel\Users\UserNotFoundException $e)
 		{
 			// Redirect to the forgot password page
 			return Redirect::route('forgot-password')->with('error', Lang::get('kit::auth/message.account_not_found'));
@@ -324,7 +326,7 @@ class AuthController extends BaseController {
 		try
 		{
 			// Find the user using the password reset code
-			$user = Sentry::getUserProvider()->findByResetPasswordCode($passwordResetCode);
+			$user = Sentinel::getUserRepository()->findByResetPasswordCode($passwordResetCode);
 
 			// Attempt to reset the user password
 			if ($user->attemptResetPassword($passwordResetCode, Input::get('password')))
@@ -338,7 +340,7 @@ class AuthController extends BaseController {
 				return Redirect::route('signin')->with('error', Lang::get('kit::auth/message.forgot-password-confirm.error'));
 			}
 		}
-		catch (\Cartalyst\Sentry\Users\UserNotFoundException $e)
+		catch (\Cartalyst\Sentinel\Users\UserNotFoundException $e)
 		{
 			// Redirect to the forgot password page
 			return Redirect::route('forgot-password')->with('error', Lang::get('kit::auth/message.account_not_found'));
@@ -353,7 +355,7 @@ class AuthController extends BaseController {
 	public function getLogout()
 	{
 		// Log the user out
-		Sentry::logout();
+		Sentinel::logout();
 
 		// Redirect to the users page
 		return Redirect::to('/')->with('success', 'You have successfully logged out!');

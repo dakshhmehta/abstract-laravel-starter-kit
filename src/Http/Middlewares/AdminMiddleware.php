@@ -1,6 +1,6 @@
 <?php namespace Kit\Http\Middlewares;
 
-use Sentry;
+use Sentinel;
 use Closure;
 
 class AdminMiddleware {
@@ -13,7 +13,7 @@ class AdminMiddleware {
 	 */
 	public function handle($request, Closure $next)
 	{
-		if (!Sentry::check() or !Sentry::getUser()->hasPermission('admin'))
+		if (!Sentinel::check() or !Sentinel::getUser()->hasPermission('admin'))
 		{
 			if ($request->ajax())
 			{

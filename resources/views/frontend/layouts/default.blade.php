@@ -68,14 +68,14 @@
 						<li {{ (Request::is('contact-us') ? 'class="active"' : '') }}><a href="{{ url('contact-us') }}"><i class="icon-file icon-white"></i> Contact us</a></li>
 			      </ul>
 			      <ul class="nav navbar-nav navbar-right">
-						@if (Sentry::check())
+						@if (Sentinel::check())
 							<li class="dropdown">
 								<a class="dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#" href="{{ route('account') }}">
-									Welcome, {{ Sentry::getUser()->first_name }}
+									Welcome, {{ Sentinel::getUser()->first_name }}
 									<b class="caret"></b>
 								</a>
 								<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-									@if(Sentry::getUser()->hasAccess('admin'))
+									@if(Sentinel::getUser()->hasAccess('admin'))
 									<li><a href="{{ route('admin') }}"><i class="icon-cog"></i> Administration</a></li>
 									@endif
 									<li{{ (Request::is('account/profile') ? ' class="active"' : '') }}><a href="{{ route('profile') }}"><i class="icon-user"></i> Your profile</a></li>
