@@ -6,8 +6,8 @@
 		<meta charset="utf-8" />
 		<title>
 			@section('title')
-			Administration
 			@show
+			- @lang('kit::kit.title') 
 		</title>
 		<meta name="keywords" content="your, awesome, keywords, here" />
 		<meta name="author" content="Jon Doe" />

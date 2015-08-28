@@ -6,8 +6,8 @@
 		<meta charset="utf-8" />
 		<title>
 			@section('title')
-			Laravel Starter App
 			@show
+			- @lang('kit::kit.title')
 		</title>
 		<meta name="keywords" content="laravel, kit, starter, package" />
 		<meta name="author" content="Daksh Mehta" />
