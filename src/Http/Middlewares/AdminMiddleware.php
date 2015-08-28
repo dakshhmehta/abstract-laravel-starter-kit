@@ -13,7 +13,7 @@ class AdminMiddleware {
 	 */
 	public function handle($request, Closure $next)
 	{
-		if (!Sentinel::check() or !Sentinel::getUser()->hasPermission('admin'))
+		if (!Sentinel::check() or !Sentinel::getUser()->hasAccess('admin'))
 		{
 			if ($request->ajax())
 			{

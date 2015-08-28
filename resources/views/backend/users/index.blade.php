@@ -50,7 +50,7 @@ User Management ::
 				@if ( ! is_null($user->deleted_at))
 				<a href="{{ route('restore/user', $user->id) }}" class="btn btn-mini btn-warning">@lang('kit::button.restore')</a>
 				@else
-				@if (Sentry::getId() !== $user->id)
+				@if (Sentinel::getUser()->id !== $user->id)
 				<a href="{{ route('delete/user', $user->id) }}" class="btn btn-mini btn-danger">@lang('kit::button.delete')</a>
 				@else
 				<span class="btn btn-mini btn-danger disabled">@lang('kit::button.delete')</span>

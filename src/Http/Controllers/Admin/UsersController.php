@@ -1,15 +1,15 @@
 <?php namespace Kit\Http\Controllers\Admin;
 
 use Kit\Http\Controllers\AdminController;
-use Cartalyst\Sentry\Users\LoginRequiredException;
-use Cartalyst\Sentry\Users\PasswordRequiredException;
-use Cartalyst\Sentry\Users\UserExistsException;
-use Cartalyst\Sentry\Users\UserNotFoundException;
+use Cartalyst\Sentinel\Users\LoginRequiredException;
+use Cartalyst\Sentinel\Users\PasswordRequiredException;
+use Cartalyst\Sentinel\Users\UserExistsException;
+use Cartalyst\Sentinel\Users\UserNotFoundException;
 use Config;
 use Input;
 use Lang;
 use Redirect;
-use Sentry;
+use Sentinel;
 use Validator;
 use View;
 
@@ -36,7 +36,7 @@ class UsersController extends AdminController {
 	public function getIndex()
 	{
 		// Grab all the users
-		$users = Sentry::getUserProvider()->createModel();
+		$users = Sentinel::getUserRepository()->createModel();
 
 		// Do we want to include the deleted users?
 		if (Input::get('withTrashed'))
@@ -67,7 +67,7 @@ class UsersController extends AdminController {
 	public function getCreate()
 	{
 		// Get all the available groups
-		$groups = Sentry::getGroupProvider()->findAll();
+		$groups = Sentinel::getRoleRepository()->get();
 
 		// Selected groups
 		$selectedGroups = Input::old('groups', array());
@@ -113,14 +113,14 @@ class UsersController extends AdminController {
 			$inputs = Input::except('csrf_token', 'password_confirm', 'groups');
 
 			// Was the user created?
-			if ($user = Sentry::getUserProvider()->create($inputs))
+			if ($user = Sentinel::getUserRepository()->create($inputs))
 			{
 				// Assign the selected groups to this user
 				foreach (Input::get('groups', array()) as $groupId)
 				{
-					$group = Sentry::getGroupProvider()->findById($groupId);
+					$group = Sentinel::getRoleRepository()->findById($groupId);
 
-					$user->addGroup($group);
+					$user->roles()->attach($group);
 				}
 
 				// Prepare the success message
@@ -164,17 +164,17 @@ class UsersController extends AdminController {
 		try
 		{
 			// Get the user information
-			$user = Sentry::getUserProvider()->findById($id);
+			$user = Sentinel::getUserRepository()->findById($id);
 
 			// Get this user groups
-			$userGroups = $user->groups()->lists('name', 'group_id');
+			$userGroups = $user->roles()->lists('name', 'id');
 
 			// Get this user permissions
 			$userPermissions = array_merge(Input::old('permissions', array('superuser' => -1)), $user->getPermissions());
 			$this->encodePermissions($userPermissions);
 
 			// Get a list of all the available groups
-			$groups = Sentry::getGroupProvider()->findAll();
+			$groups = Sentinel::getRoleRepository()->get();
 
 			// Get all the available permissions
 			$permissions = Config::get('permissions');
@@ -210,7 +210,7 @@ class UsersController extends AdminController {
 		try
 		{
 			// Get the user information
-			$user = Sentry::getUserProvider()->findById($id);
+			$user = Sentinel::getUserRepository()->findById($id);
 		}
 		catch (UserNotFoundException $e)
 		{
@@ -272,7 +272,7 @@ class UsersController extends AdminController {
 			// Assign the user to groups
 			foreach ($groupsToAdd as $groupId)
 			{
-				$group = Sentry::getGroupProvider()->findById($groupId);
+				$group = Sentinel::getRoleRepository()->findById($groupId);
 
 				$user->addGroup($group);
 			}
@@ -280,7 +280,7 @@ class UsersController extends AdminController {
 			// Remove the user from groups
 			foreach ($groupsToRemove as $groupId)
 			{
-				$group = Sentry::getGroupProvider()->findById($groupId);
+				$group = Sentinel::getRoleRepository()->findById($groupId);
 
 				$user->removeGroup($group);
 			}
@@ -318,10 +318,10 @@ class UsersController extends AdminController {
 		try
 		{
 			// Get user information
-			$user = Sentry::getUserProvider()->findById($id);
+			$user = Sentinel::getUserRepository()->findById($id);
 
 			// Check if we are not trying to delete ourselves
-			if ($user->id === Sentry::getId())
+			if ($user->id === Sentinel::getUser()->id)
 			{
 				// Prepare the error message
 				$error = Lang::get('kit::admin/users/message.error.delete');
@@ -331,7 +331,7 @@ class UsersController extends AdminController {
 			}
 
 			// Do we have permission to delete this user?
-			if ($user->isSuperUser() and ! Sentry::getUser()->isSuperUser())
+			if ($user->isSuperUser() and ! Sentinel::getUser()->isSuperUser())
 			{
 				// Redirect to the user management page
 				return Redirect::route('users')->with('error', 'Insufficient permissions!');
@@ -367,7 +367,7 @@ class UsersController extends AdminController {
 		try
 		{
 			// Get user information
-			$user = Sentry::getUserProvider()->createModel()->withTrashed()->find($id);
+			$user = Sentinel::getUserRepository()->createModel()->withTrashed()->find($id);
 
 			// Restore the user
 			$user->restore();

@@ -81,7 +81,7 @@ User Update ::
 			<div class="form-group {{ $errors->has('activated') ? 'has-error' : '' }}">
 				<label class="control-label col-md-3" for="activated">User Activated</label>
 				<div class="col-md-9">
-					<select{{ ($user->id === Sentry::getId() ? ' disabled="disabled"' : '') }} name="activated" id="activated">
+					<select{{ ($user->id === Sentinel::getUser()->id ? ' disabled="disabled"' : '') }} name="activated" id="activated">
 						<option value="1"{{ ($user->isActivated() ? ' selected="selected"' : '') }}>@lang('kit::general.yes')</option>
 						<option value="0"{{ ( ! $user->isActivated() ? ' selected="selected"' : '') }}>@lang('kit::general.no')</option>
 					</select>

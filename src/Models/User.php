@@ -1,5 +1,6 @@
 <?php namespace Kit\Models;
 
+use Cartalyst\Sentinel\Laravel\Facades\Activation;
 use Cartalyst\Sentinel\Users\EloquentUser as SentinelUserModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -32,6 +33,10 @@ class User extends SentinelUserModel {
 
 		// Return the Gravatar url
 		return "//gravatar.org/avatar/{$gravatar}";
+	}
+
+	public function isActivated(){
+		return Activation::completed($this);
 	}
 
 }

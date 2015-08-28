@@ -232,8 +232,8 @@ class AppInstallCommand extends Command {
 			'name'        => 'Admin',
 			'slug'			=> 'admin',
 			'permissions' => array(
-				'admin' => 1,
-				'users' => 1
+				'admin' => true,
+				'users' => true
 			)
 		));
 
@@ -252,8 +252,8 @@ class AppInstallCommand extends Command {
 		// Prepare the user data array.
 		$data = array_merge($this->userData, array(
 			'permissions' => array(
-				'admin' => 1,
-				'user'  => 1,
+				'admin' => true,
+				'user'  => true,
 			),
 		));
 
