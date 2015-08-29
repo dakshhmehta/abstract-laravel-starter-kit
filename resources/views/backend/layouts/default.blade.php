@@ -42,6 +42,8 @@
 		<link rel="apple-touch-icon-precomposed" href="{{ asset('assets/ico/apple-touch-icon-57-precomposed.png') }}">
 		<link rel="shortcut icon" href="{{ asset('assets/ico/favicon.png') }}">
 
+		{!! Template::renderCSS() !!}
+		{!! Template::renderRawCSS() !!}
 		@yield('head')
 	</head>
 
@@ -98,6 +100,8 @@
 		<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
 		<script src="//maxcdn.bootstrapcdn.com/bootstrap/latest/js/bootstrap.min.js"></script>
 
+		{!! Template::renderJS() !!}
+		{!! Template::renderRawJS() !!}
 		@yield('footer')
 	</body>
 </html>
