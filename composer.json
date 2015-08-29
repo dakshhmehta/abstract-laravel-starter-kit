@@ -2,7 +2,8 @@
     "name": "dakshhmehta/laravel-starter-kit",
     "description": "Laravel 5 Starter Kit Package",
     "require": {
-        "cartalyst/sentinel": "2.0.*"
+        "cartalyst/sentinel": "2.0.*",
+        "dakshhmehta/helpers": "dev-master"
     },
     "license": "MIT",
     "authors": [
