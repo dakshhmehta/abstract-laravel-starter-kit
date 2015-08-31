@@ -52,6 +52,10 @@ class KitServiceProvider extends ServiceProvider {
 		$this->publishes([
         	__DIR__.'/../../resources/lang' => base_path('resources/lang/vendor/kit'),
     	]);	
+
+		$this->publishes([
+        	__DIR__.'/../../resources/views' => base_path('resources/views/vendor/kit'),,
+    	]);	
 	}
 
 	/**
