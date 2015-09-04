@@ -1,17 +1,30 @@
-<?php namespace Kit\Http\Middlewares;
+<?php 
+
+namespace Kit\Http\Middlewares;
 
 use Cartalyst\Sentinel\Sentinel;
 use Closure;
 
-class AdminMiddleware {
-	protected $guard;
 
-	public function __construct(Sentinel $guard)
+class Authenticate {
+
+	/**
+	 * The Guard implementation.
+	 *
+	 * @var Guard
+	 */
+	protected $auth;
+
+	/**
+	 * Create a new filter instance.
+	 *
+	 * @param  Guard  $auth
+	 * @return void
+	 */
+	public function __construct(Sentinel $auth)
 	{
-		$this->guard = $guard;
+		$this->auth = $auth;
 	}
-
-
 
 	/**
 	 * Handle an incoming request.
@@ -22,7 +35,7 @@ class AdminMiddleware {
 	 */
 	public function handle($request, Closure $next)
 	{
-		if (!$this->guard->check() or !$this->guard->getUser()->hasAccess('admin'))
+		if (! $this->auth->check())
 		{
 			if ($request->ajax())
 			{
@@ -36,4 +49,5 @@ class AdminMiddleware {
 
 		return $next($request);
 	}
+
 }

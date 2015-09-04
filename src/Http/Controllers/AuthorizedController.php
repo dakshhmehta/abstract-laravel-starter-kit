@@ -17,6 +17,6 @@ class AuthorizedController extends BaseController {
 	public function __construct()
 	{
 		// Apply the auth filter
-		//$this->middleware('auth');
+		$this->middleware('auth');
 	}
 }

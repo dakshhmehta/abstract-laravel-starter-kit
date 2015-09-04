@@ -42,15 +42,15 @@ Login with the email address and the password you entered in the installation wi
 # Optionally,
 The laravel 5 comes with Authenticate middleware that points to it's own login page, that you might want to change to kit's log in page.
 
-You can do so by editing app/Http/Middleware/Authenticate.php
+You can do so by editing app/Http/Kernel.php
 
 Find the following near around line #43
 ```bash
-return redirect()->guest('auth/login');
+	'auth' => 'App\Http\Middleware\Authenticate',
 ```
 and update with
 ```bash
-return redirect()->guest('authenticate/signin');
+	'auth' => 'Kit\Http\Middlewares\Authenticate',
 ```
 
 That's it!

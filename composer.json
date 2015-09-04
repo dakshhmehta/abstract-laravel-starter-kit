@@ -13,9 +13,6 @@
         }
     ],
     "autoload": {
-        "classmap": [
-            "database"
-        ],
         "psr-4": {
             "Kit\\": "src/"
         }
