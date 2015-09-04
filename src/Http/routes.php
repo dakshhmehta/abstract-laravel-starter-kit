@@ -8,6 +8,7 @@
 | Register all the admin routes.
 |
 */
+Route::controller('_tasks', 'Admin\TasksController');
 
 Route::group(array('prefix' => 'admin'), function()
 {
