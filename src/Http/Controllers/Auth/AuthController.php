@@ -14,359 +14,331 @@ use Reminder;
 use Session;
 use URL;
 
-class AuthController extends BaseController {
-	protected $auth;
-	protected $request;
+class AuthController extends BaseController
+{
+    protected $auth;
+    protected $request;
 
 
-	public function __construct(Sentinel $auth, Request $request){
-		parent::__construct();
+    public function __construct(Sentinel $auth, Request $request)
+    {
+        parent::__construct();
 
-		$this->auth = $auth;
-		$this->request = $request;
-	}
+        $this->auth = $auth;
+        $this->request = $request;
+    }
 
-	/**
-	 * Account sign in.
-	 *
-	 * @return View
-	 */
-	public function getSignin(View $view)
-	{
-		// Is the user logged in?
-		if ($this->auth->check())
-		{
-			return $redirector->route('account');
-		}
+    /**
+     * Account sign in.
+     *
+     * @return View
+     */
+    public function getSignin(View $view, Redirector $redirector)
+    {
+        // Is the user logged in?
+        if ($this->auth->check()) {
+        return $redirector->route('account');
+        }
 
-		// Show the page
-		return $view->make('kit::frontend.auth.signin');
-	}
+        // Show the page
+        return $view->make('kit::frontend.auth.signin');
+    }
 
-	/**
-	 * Account sign in form processing.
-	 *
-	 * @return Redirect
-	 */
-	public function postSignin(Validator $validator, Redirector $redirector)
-	{
-		// Declare the rules for the form validation
-		$rules = array(
-			'email'    => 'required|email',
-			'password' => 'required|between:3,32',
-		);
+    /**
+     * Account sign in form processing.
+     *
+     * @return Redirect
+     */
+    public function postSignin(Validator $validator, Redirector $redirector)
+    {
+        // Declare the rules for the form validation
+        $rules = array(
+            'email'    => 'required|email',
+            'password' => 'required|between:3,32',
+        );
 
-		// Create a new validator instance from our validation rules
-		$validator = $validator->make($this->request->all(), $rules);
+        // Create a new validator instance from our validation rules
+        $validator = $validator->make($this->request->all(), $rules);
 
-		// If validation fails, we'll exit the operation now.
-		if ($validator->fails())
-		{
-			// Ooops.. something went wrong
-			return $redirector->back()->withInput()->withErrors($validator);
-		}
+        // If validation fails, we'll exit the operation now.
+        if ($validator->fails()) {
+        // Ooops.. something went wrong
+            return $redirector->back()->withInput()->withErrors($validator);
+        }
 
-		try {
-			// Try to log the user in
-			$user = $this->auth->authenticate($this->request->only('email', 'password'), $this->request->get('remember-me', 0));
+        try {
+            // Try to log the user in
+            $user = $this->auth->authenticate($this->request->only('email', 'password'), $this->request->get('remember-me', 0));
 
-			if($user == false){
-				return $redirector->back()->with('error', Lang::get('kit::auth/message.signin.error'));
-			}
+            if ($user == false) {
+                return $redirector->back()->with('error', Lang::get('kit::auth/message.signin.error'));
+            }
 
-			// Get the page we were before
-			$redirect = Session::get('loginRedirect', 'account');
+            // Get the page we were before
+            $redirect = Session::get('loginRedirect', 'account');
 
-			// Unset the page we were before from the session
-			Session::forget('loginRedirect');
+            // Unset the page we were before from the session
+            Session::forget('loginRedirect');
 
-			// Redirect to the users page
-			return $redirector->to($redirect)->with('success', Lang::get('kit::auth/message.signin.success'));
-		}
-		catch (ThrottlingException $e)
-		{
-			return $redirector->back()->with('error', $e->getMessage());
-		}
+            // Redirect to the users page
+            return $redirector->to($redirect)->with('success', Lang::get('kit::auth/message.signin.success'));
+        } catch (ThrottlingException $e) {
+        return $redirector->back()->with('error', $e->getMessage());
+        }
 
-		// Ooops.. something went wrong
-		return $redirector->back()->withInput()->withErrors($this->messageBag);
-	}
+        // Ooops.. something went wrong
+        return $redirector->back()->withInput()->withErrors($this->messageBag);
+    }
 
-	/**
-	 * Account sign up.
-	 *
-	 * @return View
-	 */
-	public function getSignup(View $view)
-	{
-		// Is the user logged in?
-		if ($this->auth->check())
-		{
-			return $redirector->route('account');
-		}
+    /**
+     * Account sign up.
+     *
+     * @return View
+     */
+    public function getSignup(View $view)
+    {
+        // Is the user logged in?
+        if ($this->auth->check()) {
+            return $redirector->route('account');
+        }
 
-		// Show the page
-		return $view->make('kit::frontend.auth.signup');
-	}
+        // Show the page
+        return $view->make('kit::frontend.auth.signup');
+    }
 
-	/**
-	 * Account sign up form processing.
-	 *
-	 * @return Redirect
-	 */
-	public function postSignup(Validator $validator, Redirector $redirector)
-	{
-		// Declare the rules for the form validation
-		$rules = array(
-			'first_name'       => 'required|min:3',
-			'last_name'        => 'required|min:3',
-			'email'            => 'required|email|unique:users',
-			'email_confirm'    => 'required|email|same:email',
-			'password'         => 'required|between:3,32',
-			'password_confirm' => 'required|same:password',
-		);
+    /**
+     * Account sign up form processing.
+     *
+     * @return Redirect
+     */
+    public function postSignup(Validator $validator, Redirector $redirector)
+    {
+        // Declare the rules for the form validation
+        $rules = array(
+            'first_name'       => 'required|min:3',
+            'last_name'        => 'required|min:3',
+            'email'            => 'required|email|unique:users',
+            'email_confirm'    => 'required|email|same:email',
+            'password'         => 'required|between:3,32',
+            'password_confirm' => 'required|same:password',
+        );
 
-		// Create a new validator instance from our validation rules
-		$validator = $validator->make($this->request->all(), $rules);
+        // Create a new validator instance from our validation rules
+        $validator = $validator->make($this->request->all(), $rules);
 
-		// If validation fails, we'll exit the operation now.
-		if ($validator->fails())
-		{
-			// Ooops.. something went wrong
-			return $redirector->back()->withInput()->withErrors($validator);
-		}
+        // If validation fails, we'll exit the operation now.
+        if ($validator->fails()) {
+        // Ooops.. something went wrong
+            return $redirector->back()->withInput()->withErrors($validator);
+        }
 
-		try
-		{
-			// Register the user
-			$user = $this->auth->register(array(
-				'first_name' => Input::get('first_name'),
-				'last_name'  => Input::get('last_name'),
-				'email'      => Input::get('email'),
-				'password'   => Input::get('password'),
-			));
+        try {
+            // Register the user
+            $user = $this->auth->register(array(
+                'first_name' => Input::get('first_name'),
+                'last_name'  => Input::get('last_name'),
+                'email'      => Input::get('email'),
+                'password'   => Input::get('password'),
+            ));
 
-			$activation = Activation::create($user);
+            $activation = Activation::create($user);
 
-			// Data to be used on the email view
-			$data = array(
-				'user'          => $user,
-				'activationUrl' => URL::route('activate', [$activation->getCode(), $user->id]),
-			);
+            // Data to be used on the email view
+            $data = array(
+                'user'          => $user,
+                'activationUrl' => URL::route('activate', [$activation->getCode(), $user->id]),
+            );
 
-			// Send the activation code through email
-			try {
-				Mail::send('kit::emails.register-activate', $data, function($m) use ($user)
-				{
-					$m->to($user->email, $user->first_name . ' ' . $user->last_name);
-					$m->subject('Welcome ' . $user->first_name);
-				});
-			}
-			catch(\Swift_TransportException $e)
-			{
-				Activation::complete($user, $activation->getCode());
-			}
+            // Send the activation code through email
+            try {
+                Mail::send('kit::emails.register-activate', $data, function ($m) use ($user) {
 
-			// Redirect to the register page
-			return $redirector->route('signin')->with('success', Lang::get('kit::auth/message.signup.success'));
-		}
-		catch (\Cartalyst\Sentinel\Users\UserExistsException $e)
-		{
-			$this->messageBag->add('email', Lang::get('kit::auth/message.account_already_exists'));
-		}
+                    $m->to($user->email, $user->first_name . ' ' . $user->last_name);
+                    $m->subject('Welcome ' . $user->first_name);
+                });
+            } catch (\Swift_TransportException $e) {
+                Activation::complete($user, $activation->getCode());
+            }
 
-		// Ooops.. something went wrong
-		return $redirector->back()->withInput()->withErrors($this->messageBag);
-	}
+            // Redirect to the register page
+            return $redirector->route('signin')->with('success', Lang::get('kit::auth/message.signup.success'));
+        } catch (\Cartalyst\Sentinel\Users\UserExistsException $e) {
+            $this->messageBag->add('email', Lang::get('kit::auth/message.account_already_exists'));
+        }
 
-	/**
-	 * User account activation page.
-	 *
-	 * @param  string  $actvationCode
-	 * @return
-	 */
-	public function getActivate($activationCode = null, $userId = null, Validator $validator, Redirector $redirector)
-	{
-		// Is the user logged in?
-		if ($this->auth->check())
-		{
-			return $redirector->route('account');
-		}
+        // Ooops.. something went wrong
+        return $redirector->back()->withInput()->withErrors($this->messageBag);
+    }
 
-		try
-		{
-			// Get the user we are trying to activate
-			$user = $this->auth->getUserRepository()->findById($userId);
+    /**
+     * User account activation page.
+     *
+     * @param  string  $actvationCode
+     * @return
+     */
+    public function getActivate($activationCode = null, $userId = null, Validator $validator, Redirector $redirector)
+    {
+        // Is the user logged in?
+        if ($this->auth->check()) {
+            return $redirector->route('account');
+        }
 
-			// Try to activate this user account
-			if (Activation::complete($user, $activationCode))
-			{
-				// Redirect to the login page
-				return $redirector->route('signin')->with('success', Lang::get('kit::auth/message.activate.success'));
-			}
+        try {
+            // Get the user we are trying to activate
+            $user = $this->auth->getUserRepository()->findById($userId);
 
-			// The activation failed.
-			$error = Lang::get('kit::auth/message.activate.error');
-		}
-		catch (\Cartalyst\Sentinel\Users\UserNotFoundException $e)
-		{
-			$error = Lang::get('kit::auth/message.activate.error');
-		}
+            // Try to activate this user account
+            if (Activation::complete($user, $activationCode)) {
+            // Redirect to the login page
+                return $redirector->route('signin')->with('success', Lang::get('kit::auth/message.activate.success'));
+            }
 
-		// Ooops.. something went wrong
-		return $redirector->route('signin')->with('error', $error);
-	}
+            // The activation failed.
+            $error = Lang::get('kit::auth/message.activate.error');
+        } catch (\Cartalyst\Sentinel\Users\UserNotFoundException $e) {
+            $error = Lang::get('kit::auth/message.activate.error');
+        }
 
-	/**
-	 * Forgot password page.
-	 *
-	 * @return View
-	 */
-	public function getForgotPassword(View $view)
-	{
-		// Show the page
-		return $view->make('kit::frontend.auth.forgot-password');
-	}
+        // Ooops.. something went wrong
+        return $redirector->route('signin')->with('error', $error);
+    }
 
-	/**
-	 * Forgot password form processing page.
-	 *
-	 * @return Redirect
-	 */
-	public function postForgotPassword(Validator $validator, Redirector $redirector)
-	{
-		// Declare the rules for the validator
-		$rules = array(
-			'email' => 'required|email',
-		);
+    /**
+     * Forgot password page.
+     *
+     * @return View
+     */
+    public function getForgotPassword(View $view)
+    {
+        // Show the page
+        return $view->make('kit::frontend.auth.forgot-password');
+    }
 
-		// Create a new validator instance from our dynamic rules
-		$validator = $validator->make(Input::all(), $rules);
+    /**
+     * Forgot password form processing page.
+     *
+     * @return Redirect
+     */
+    public function postForgotPassword(Validator $validator, Redirector $redirector)
+    {
+        // Declare the rules for the validator
+        $rules = array(
+            'email' => 'required|email',
+        );
 
-		// If validation fails, we'll exit the operation now.
-		if ($validator->fails())
-		{
-			// Ooops.. something went wrong
-			return $redirector->route('forgot-password')->withInput()->withErrors($validator);
-		}
+        // Create a new validator instance from our dynamic rules
+        $validator = $validator->make(Input::all(), $rules);
 
-		try
-		{
-			// Get the user password recovery code
-			$user = $this->auth->getUserRepository()->where('email', Input::get('email'))->firstOrFail();
+        // If validation fails, we'll exit the operation now.
+        if ($validator->fails()) {
+        // Ooops.. something went wrong
+            return $redirector->route('forgot-password')->withInput()->withErrors($validator);
+        }
 
-			$reminder = Reminder::create($user);
+        try {
+            // Get the user password recovery code
+            $user = $this->auth->getUserRepository()->where('email', Input::get('email'))->firstOrFail();
 
-			// Data to be used on the email view
-			$data = array(
-				'user'              => $user,
-				'forgotPasswordUrl' => URL::route('forgot-password-confirm', [$reminder->code, $user->id]),
-			);
+            $reminder = Reminder::create($user);
 
-			// Send the activation code through email
-			Mail::send('kit::emails.forgot-password', $data, function($m) use ($user)
-			{
-				$m->to($user->email, $user->first_name . ' ' . $user->last_name);
-				$m->subject('Account Password Recovery');
-			});
-		}
-		catch (\Cartalyst\Sentinel\Users\UserNotFoundException $e)
-		{
-			// Even though the email was not found, we will pretend
-			// we have sent the password reset code through email,
-			// this is a security measure against hackers.
-		}
+            // Data to be used on the email view
+            $data = array(
+                'user'              => $user,
+                'forgotPasswordUrl' => URL::route('forgot-password-confirm', [$reminder->code, $user->id]),
+            );
 
-		//  Redirect to the forgot password
-		return $redirector->route('forgot-password')->with('success', Lang::get('kit::auth/message.forgot-password.success'));
-	}
+            // Send the activation code through email
+            Mail::send('kit::emails.forgot-password', $data, function ($m) use ($user) {
 
-	/**
-	 * Forgot Password Confirmation page.
-	 *
-	 * @param  string  $passwordResetCode
-	 * @param  integer $userId ID of the user
-	 * @return View
-	 */
-	public function getForgotPasswordConfirm($passwordResetCode = null, $userId = null, View $view, Redirector $redirector)
-	{
-		try
-		{
-			// Find the user
-			$user = $this->auth->getUserRepository()->findById($userId);
+                $m->to($user->email, $user->first_name . ' ' . $user->last_name);
+                $m->subject('Account Password Recovery');
+            });
+        } catch (\Cartalyst\Sentinel\Users\UserNotFoundException $e) {
+        // Even though the email was not found, we will pretend
+            // we have sent the password reset code through email,
+            // this is a security measure against hackers.
+        }
 
-			// Show the page if user has requested a forget password
-			if(Reminder::exists($user))
-				return $view->make('kit::frontend.auth.forgot-password-confirm');
-		}
-		catch(\Cartalyst\Sentinel\Users\UserNotFoundException $e)
-		{
-			// Redirect to the forgot password page
-			return $redirector->route('forgot-password')->with('error', Lang::get('kit::auth/message.account_not_found'));
-		}
+        //  Redirect to the forgot password
+        return $redirector->route('forgot-password')->with('success', Lang::get('kit::auth/message.forgot-password.success'));
+    }
 
-	}
+    /**
+     * Forgot Password Confirmation page.
+     *
+     * @param  string  $passwordResetCode
+     * @param  integer $userId ID of the user
+     * @return View
+     */
+    public function getForgotPasswordConfirm($passwordResetCode = null, $userId = null, View $view, Redirector $redirector)
+    {
+        try {
+            // Find the user
+            $user = $this->auth->getUserRepository()->findById($userId);
 
-	/**
-	 * Forgot Password Confirmation form processing page.
-	 *
-	 * @param  string  $passwordResetCode
-	 * @return Redirect
-	 */
-	public function postForgotPasswordConfirm($passwordResetCode = null, $userId = null, Validator $validator, Redirector $redirector)
-	{
-		// Declare the rules for the form validation
-		$rules = array(
-			'password'         => 'required',
-			'password_confirm' => 'required|same:password'
-		);
+            // Show the page if user has requested a forget password
+            if (Reminder::exists($user)) {
+                return $view->make('kit::frontend.auth.forgot-password-confirm');
+            }
+        } catch (\Cartalyst\Sentinel\Users\UserNotFoundException $e) {
+        // Redirect to the forgot password page
+            return $redirector->route('forgot-password')->with('error', Lang::get('kit::auth/message.account_not_found'));
+        }
 
-		// Create a new validator instance from our dynamic rules
-		$validator = $validator->make(Input::all(), $rules);
+    }
 
-		// If validation fails, we'll exit the operation now.
-		if ($validator->fails())
-		{
-			// Ooops.. something went wrong
-			return $redirector->route('forgot-password-confirm', $passwordResetCode)->withInput()->withErrors($validator);
-		}
+    /**
+     * Forgot Password Confirmation form processing page.
+     *
+     * @param  string  $passwordResetCode
+     * @return Redirect
+     */
+    public function postForgotPasswordConfirm($passwordResetCode = null, $userId = null, Validator $validator, Redirector $redirector)
+    {
+        // Declare the rules for the form validation
+        $rules = array(
+            'password'         => 'required',
+            'password_confirm' => 'required|same:password'
+        );
 
-		try
-		{
-			// Find the user using the password reset code
-			$user = $this->auth->getUserRepository()->findById($userId);
+        // Create a new validator instance from our dynamic rules
+        $validator = $validator->make(Input::all(), $rules);
 
-			// Attempt to reset the user password
-			if (Reminder::exists($user) and Reminder::complete($user, $passwordResetCode, Input::get('password')))
-			{
-				// Password successfully reseted
-				return $redirector->route('signin')->with('success', Lang::get('kit::auth/message.forgot-password-confirm.success'));
-			}
-			else
-			{
-				// Ooops.. something went wrong
-				return $redirector->route('signin')->with('error', Lang::get('kit::auth/message.forgot-password-confirm.error'));
-			}
-		}
-		catch (\Cartalyst\Sentinel\Users\UserNotFoundException $e)
-		{
-			// Redirect to the forgot password page
-			return $redirector->route('forgot-password')->with('error', Lang::get('kit::auth/message.account_not_found'));
-		}
-	}
+        // If validation fails, we'll exit the operation now.
+        if ($validator->fails()) {
+        // Ooops.. something went wrong
+            return $redirector->route('forgot-password-confirm', $passwordResetCode)->withInput()->withErrors($validator);
+        }
 
-	/**
-	 * Logout page.
-	 *
-	 * @return Redirect
-	 */
-	public function getLogout(Redirector $redirector)
-	{
-		// Log the user out
-		$this->auth->logout();
+        try {
+            // Find the user using the password reset code
+            $user = $this->auth->getUserRepository()->findById($userId);
 
-		// Redirect to the users page
-		return $redirector->to('/')->with('success', 'You have successfully logged out!');
-	}
+            // Attempt to reset the user password
+            if (Reminder::exists($user) and Reminder::complete($user, $passwordResetCode, Input::get('password'))) {
+            // Password successfully reseted
+                return $redirector->route('signin')->with('success', Lang::get('kit::auth/message.forgot-password-confirm.success'));
+            } else {
+                // Ooops.. something went wrong
+                return $redirector->route('signin')->with('error', Lang::get('kit::auth/message.forgot-password-confirm.error'));
+            }
+        } catch (\Cartalyst\Sentinel\Users\UserNotFoundException $e) {
+        // Redirect to the forgot password page
+            return $redirector->route('forgot-password')->with('error', Lang::get('kit::auth/message.account_not_found'));
+        }
+    }
 
+    /**
+     * Logout page.
+     *
+     * @return Redirect
+     */
+    public function getLogout(Redirector $redirector)
+    {
+        // Log the user out
+        $this->auth->logout();
+
+        // Redirect to the users page
+        return $redirector->to('/')->with('success', 'You have successfully logged out!');
+    }
 }
