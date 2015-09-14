@@ -6,127 +6,252 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use View;
 use App;
+use Illuminate\Validation\Factory as Validator;
+use Illuminate\Routing\Redirector;
+use URL;
 
-class CRUDController extends BaseController {
-	/**
-	 * Request Object
-	 * @var Illuminate\Http\Request
-	 */
-	protected $request;
+class CRUDController extends BaseController
+{
+    /**
+     * Request Object
+     * @var Illuminate\Http\Request
+     */
+    protected $request;
 
-	/**
-	 * Support to create operation
-	 * @var boolean
-	 */
-	protected $create = true;
+    /**
+     * Support to create operation
+     * @var boolean
+     */
+    protected $create = true;
 
-	/**
-	 * Support to edit operation
-	 * @var boolean
-	 */
-	protected $edit = true;
+    /**
+     * Form Holder
+     * @var string
+     */
+    private $form = [];
 
-	/**
-	 * Support to delete operation
-	 * @var boolean
-	 */
-	protected $delete = true;
+    /**
+     * List of columns to be displayed in the table
+     * @var array
+     */
+    protected $tableColumns = [];
 
-	/**
-	 * Entity Model
-	 * @var Illuminate\Database\Eloquent\Model
-	 */
-	protected $model = null;
+    /**
+     * Support to edit operation
+     * @var boolean
+     */
+    protected $edit = true;
 
-	/**
-	 * Base path of all views
-	 * @var null
-	 */
-	protected $viewPath = null;
+    /**
+     * Support to delete operation
+     * @var boolean
+     */
+    protected $delete = true;
 
-	/**
-	 * A friendly name to folder
-	 * @var [type]
-	 */
-	private $folder;
+    /**
+     * Entity Model
+     * @var Illuminate\Database\Eloquent\Model
+     */
+    private $model = null;
 
-	public function __construct(Model $model)
-	{
-		parent::__construct();
+    /**
+     * Base path of all views
+     * @var null
+     */
+    protected $viewPath = null;
 
-		$this->request = App::make('Request');
-		$this->model = $model;
+    /**
+     * A friendly name to folder
+     * @var [type]
+     */
+    private $folder;
 
-		$this->folder = strtolower(str_plural(last(array_slice(explode('\\', get_class($this->model)), 0))));
-		$this->viewPath = 'kit::'.$this->folder;
-	}
+    public function __construct(Model $model)
+    {
+        parent::__construct();
 
-	/**
-	 * Displays all the items
-	 */
-	public function getIndex()
-	{
-		$items = $this->model->get();
+        $this->model = $model;
 
-		return $this->render('index', $items);
-	}
+        $this->folder = strtolower(str_plural(last(array_slice(explode('\\', get_class($this->model)), 0))));
+        $this->viewPath = 'kit::'.$this->folder;
+    }
 
-	/**
-	 * Displays the create form
-	 */
-	public function getCreate()
-	{
-		if($this->resolve($this->create) !== true)
-		{
-			abort(404);
-		}
+    /**
+     * Displays all the items
+     */
+    public function getIndex()
+    {
+        $items = $this->model->get();
 
-		$item = $this->model->newInstance();
+        return $this->render('index', compact('items'))->with('columns', $this->tableColumns);
+    }
 
-		return $this->render('form', compact('item'));
-	}
+    /**
+     * Display the create form
+     */
+    public function getCreate()
+    {
+        if ($this->resolve($this->create) !== true) {
+            abort(404);
+        }
 
-	/**
-	 * Displays the create form
-	 */
-	public function getEdit($id)
-	{
-		if($this->resolve($this->edit) !== true)
-		{
-			abort(404);
-		}
+        $item = $this->model->newInstance();
+        $mode = 'create';
 
-		$item = $this->model->findOrFail($id);
+        return $this->render('form', compact('item', 'mode'))->with('form', $this->getForm($mode));
+    }
 
-		return $this->render('form', compact('item'));
-	}
+    /**
+     * Saves the form and create a new entry in the database
+     */
+    public function postCreate(Validator $validator, Redirector $redirect, Request $request)
+    {
+        $rules = $this->getValidationRules('create');
 
-	/**
-	 * Renders the view. This method first checks for
-	 * controller specific folder if available and 
-	 * created by the designer, otherwise, It uses
-	 * default CRUD layout.
-	 *
-	 * @param  string $path Path of view
-	 * @param  array  $data Data to be sent to View
-	 * @return string       Parsed view to the browser
-	 */
-	protected function render($path, $data = array())
-	{
-		if(! View::exists($this->viewPath.'.'.$path))
-		{
-			$this->viewPath = 'kit::crud';
-		}
+        $validator = $validator->make($request->all(), $rules);
 
-		$data['slug'] = $this->folder;
+        if ($validator->fails()) {
+            return $redirect->back()->withErrors($validator->errors());
+        }
 
-		return View::make($this->viewPath.'.'.$path, $data);		
-	}
+        $item = $this->model->newInstance();
 
-	private function resolve($handler){
-		if($handler instanceof Closure)
-			return call_user_func($handler);
+        foreach ($rules as $field => $rules) {
+            $item[$field] = $request->get($field);
+        }
 
-		return $handler;
-	}
+        if ($item->save()) {
+            return $redirect->back()->withSuccess('Item has been saved.');
+        }
+    }
+
+    /**
+     * Display the edit form
+     */
+    public function getEdit($id)
+    {
+        if ($this->resolve($this->edit) !== true) {
+            abort(404);
+        }
+
+        $item = $this->model->findOrFail($id);
+        $mode = 'edit';
+
+        return $this->render('form', compact('item', 'mode'))->with('form', $this->getForm($mode));
+    }
+
+    /**
+     * Save the form and update the existing entry in the database
+     */
+    public function postEdit($id, Validator $validator, Redirector $redirect, Request $request)
+    {
+        $rules = $this->getValidationRules('edit');
+
+        $validator = $validator->make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return $redirect->back()->withErrors($validator->errors());
+        }
+
+        $item = $this->model->findOrFail($id);
+
+        foreach ($rules as $field => $rules) {
+            $item[$field] = $request->get($field);
+        }
+
+        if ($item->save()) {
+            return $redirect->back()->withSuccess('Item has been saved.');
+        }
+    }
+
+    /**
+     * Delete the entry from the fbsql_database(link_identifier)
+     */
+    public function getDelete($id, Redirector $redirect)
+    {
+        if ($this->model->destroy($id)) {
+            return $redirect->back()->withSuccess('Item has been deleted successfully');
+        }
+
+        abort(500);
+    }
+
+    /**
+     * Renders the view. This method first checks for
+     * controller specific folder if available and
+     * created by the designer, otherwise, It uses
+     * default CRUD layout.
+     *
+     * @param  string $path Path of view
+     * @param  array  $data Data to be sent to View
+     * @return string       Parsed view to the browser
+     */
+    protected function render($path, $data = array())
+    {
+        if (! View::exists($this->viewPath.'.'.$path)) {
+            $this->viewPath = 'kit::crud';
+        }
+
+        $data['slug'] = $this->folder;
+
+        return View::make($this->viewPath.'.'.$path, $data);
+    }
+
+    /**
+     * Resolve the variable if is invokable Closure
+     * @param  mixed $handler Anything to check and resolve
+     * @return mixed          Value after resolving the input
+     */
+    private function resolve($handler)
+    {
+        if ($handler instanceof Closure) {
+            return call_user_func($handler);
+        }
+
+        return $handler;
+    }
+
+    /**
+     * Set the form for rendering
+     * @param array $form Form array which is compatible with dakshhmehta/helpers
+     */
+    public function setForm($form)
+    {
+        $this->form = $form;
+    }
+
+    /**
+     * Return the form for specific mode after scanning and filtering
+     * @param  [type] $mode [description]
+     * @return [type]       [description]
+     */
+    public function getForm($mode)
+    {
+        foreach ($this->form['groups'] as $group => $fields) {
+            $i = 0;
+            foreach ($fields as $field) {
+                if (isset($field['mode'])) {
+                    if (! in_array($mode, $this->resolve($field['mode']))) {
+                        unset($this->form['groups'][$group][$i]);
+                    }
+                }
+                $i++;
+            }
+        }
+
+        return $this->form;
+    }
+
+    protected function getValidationRules($mode)
+    {
+        $rules = [];
+
+        foreach ($this->getForm($mode)['groups'] as $group => $fields) {
+            foreach ($fields as $field) {
+                $rules[$field['name']] = (isset($field['rules'])) ? $field['rules'] : '';
+            }
+        }
+
+        return $rules;
+    }
 }
