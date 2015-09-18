@@ -8,6 +8,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class UserRegistered extends Event
 {
+    protected $user;
+
     use SerializesModels;
 
     /**
@@ -15,9 +17,10 @@ class UserRegistered extends Event
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($user)
     {
         //
+        $this->user = $user;
     }
 
     /**
