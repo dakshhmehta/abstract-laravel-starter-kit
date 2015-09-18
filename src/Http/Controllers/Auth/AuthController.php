@@ -13,6 +13,7 @@ use Mail;
 use Reminder;
 use Session;
 use URL;
+use Event;
 
 class AuthController extends BaseController
 {
@@ -37,7 +38,7 @@ class AuthController extends BaseController
     {
         // Is the user logged in?
         if ($this->auth->check()) {
-        return $redirector->route('account');
+            return $redirector->route('account');
         }
 
         // Show the page
@@ -66,6 +67,8 @@ class AuthController extends BaseController
             return $redirector->back()->withInput()->withErrors($validator);
         }
 
+        Event::fire('user.login');
+
         try {
             // Try to log the user in
             $user = $this->auth->authenticate($this->request->only('email', 'password'), $this->request->get('remember-me', 0));
@@ -81,9 +84,11 @@ class AuthController extends BaseController
             Session::forget('loginRedirect');
 
             // Redirect to the users page
+            Event::fire('user.logged_in', [$user]);
             return $redirector->to($redirect)->with('success', Lang::get('kit::auth/message.signin.success'));
         } catch (ThrottlingException $e) {
-        return $redirector->back()->with('error', $e->getMessage());
+            Event::fire('user.login_fails');
+            return $redirector->back()->with('error', $e->getMessage());
         }
 
         // Ooops.. something went wrong
@@ -132,6 +137,8 @@ class AuthController extends BaseController
             return $redirector->back()->withInput()->withErrors($validator);
         }
 
+        Event::fire('user.register');
+
         try {
             // Register the user
             $user = $this->auth->register(array(
@@ -160,9 +167,11 @@ class AuthController extends BaseController
                 Activation::complete($user, $activation->getCode());
             }
 
+            Event::fire('user.registered', [$user]);
             // Redirect to the register page
             return $redirector->route('signin')->with('success', Lang::get('kit::auth/message.signup.success'));
         } catch (\Cartalyst\Sentinel\Users\UserExistsException $e) {
+            Event::fire('user.register_fails');
             $this->messageBag->add('email', Lang::get('kit::auth/message.account_already_exists'));
         }
 
