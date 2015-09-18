@@ -7,13 +7,19 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Validation\Factory as Validator;
 use Illuminate\View\Factory as View;
+use Kit\Events\UserLoggedIn;
+use Kit\Events\UserLoggingFails;
+use Kit\Events\UserLoggingIn;
+use Kit\Events\UserLogout;
+use Kit\Events\UserRegistered;
+use Kit\Events\UserRegistering;
+use Kit\Events\UserRegisteringFails;
 use Kit\Http\Controllers\BaseController;
 use Lang;
 use Mail;
 use Reminder;
 use Session;
 use URL;
-use Event;
 
 class AuthController extends BaseController
 {
@@ -67,7 +73,7 @@ class AuthController extends BaseController
             return $redirector->back()->withInput()->withErrors($validator);
         }
 
-        Event::fire('user.login');
+        event(new UserLoggingIn);
 
         try {
             // Try to log the user in
@@ -84,10 +90,10 @@ class AuthController extends BaseController
             Session::forget('loginRedirect');
 
             // Redirect to the users page
-            Event::fire('user.logged_in', [$user]);
+            event(new UserLoggedIn($user));
             return $redirector->to($redirect)->with('success', Lang::get('kit::auth/message.signin.success'));
         } catch (ThrottlingException $e) {
-            Event::fire('user.login_fails');
+            event(new UserLoggingFails);
             return $redirector->back()->with('error', $e->getMessage());
         }
 
@@ -137,7 +143,7 @@ class AuthController extends BaseController
             return $redirector->back()->withInput()->withErrors($validator);
         }
 
-        Event::fire('user.register');
+        event(new UserRegistering);
 
         try {
             // Register the user
@@ -167,11 +173,11 @@ class AuthController extends BaseController
                 Activation::complete($user, $activation->getCode());
             }
 
-            Event::fire('user.registered', [$user]);
+            event(new UserRegistered($user));
             // Redirect to the register page
             return $redirector->route('signin')->with('success', Lang::get('kit::auth/message.signup.success'));
         } catch (\Cartalyst\Sentinel\Users\UserExistsException $e) {
-            Event::fire('user.register_fails');
+            event(new UserRegisteringFails);
             $this->messageBag->add('email', Lang::get('kit::auth/message.account_already_exists'));
         }
 
@@ -346,6 +352,8 @@ class AuthController extends BaseController
     {
         // Log the user out
         $this->auth->logout();
+
+        event(new UserLogout);
 
         // Redirect to the users page
         return $redirector->to('/')->with('success', 'You have successfully logged out!');
