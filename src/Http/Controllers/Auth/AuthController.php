@@ -20,6 +20,7 @@ use Mail;
 use Reminder;
 use Session;
 use URL;
+use Input;
 
 class AuthController extends BaseController
 {

@@ -8,7 +8,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class UserRegistered extends Event
 {
-    protected $user;
+    public $user;
 
     use SerializesModels;
 
