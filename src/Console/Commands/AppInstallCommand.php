@@ -7,274 +7,263 @@ use Activation;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
-class AppInstallCommand extends Command {
+class AppInstallCommand extends Command
+{
 
-	/**
-	 * The console command name.
-	 *
-	 * @var string
-	 */
-	protected $name = 'app:install';
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'app:install';
 
-	/**
-	 * The console command description.
-	 *
-	 * @var string
-	 */
-	protected $description = 'Installs the application by setting up all the necessary resources.';
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Installs the application by setting up all the necessary resources.';
 
-	/**
-	 * Holds the user information.
-	 *
-	 * @var array
-	 */
-	protected $userData = array(
-		'first_name' => null,
-		'last_name'  => null,
-		'email'      => null,
-		'password'   => null
-	);
+    /**
+     * Holds the user information.
+     *
+     * @var array
+     */
+    protected $userData = array(
+        'first_name' => null,
+        'last_name'  => null,
+        'email'      => null,
+        'password'   => null
+    );
 
-	/**
-	 * Create a new command instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-		parent::__construct();
-	}
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @return mixed
-	 */
-	public function fire()
-	{
-		//
-		$this->comment('=====================================');
-		$this->comment('');
-		$this->info('  Step: 1');
-		$this->comment('');
-		$this->info('    Please follow the following');
-		$this->info('    instructions to create your');
-		$this->info('    default user.');
-		$this->comment('');
-		$this->comment('-------------------------------------');
-		$this->comment('');
-
-
-		// Let's ask the user some questions, shall we?
-		$this->askUserFirstName();
-		$this->askUserLastName();
-		$this->askUserEmail();
-		$this->askUserPassword();
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function fire()
+    {
+        //
+        $this->comment('=====================================');
+        $this->comment('');
+        $this->info('  Step: 1');
+        $this->comment('');
+        $this->info('    Please follow the following');
+        $this->info('    instructions to create your');
+        $this->info('    default user.');
+        $this->comment('');
+        $this->comment('-------------------------------------');
+        $this->comment('');
 
 
-		$this->comment('');
-		$this->comment('');
-		$this->comment('=====================================');
-		$this->comment('');
-		$this->info('  Step: 2');
-		$this->comment('');
-		$this->info('    Preparing your Application');
-		$this->comment('');
-		$this->comment('-------------------------------------');
-		$this->comment('');
+        // Let's ask the user some questions, shall we?
+        $this->askUserFirstName();
+        $this->askUserLastName();
+        $this->askUserEmail();
+        $this->askUserPassword();
 
-		// Generate the Application Encryption key
-		$this->call('key:generate');
 
-		// Create the migrations table
-		$this->call('migrate:install');
+        $this->comment('');
+        $this->comment('');
+        $this->comment('=====================================');
+        $this->comment('');
+        $this->info('  Step: 2');
+        $this->comment('');
+        $this->info('    Preparing your Application');
+        $this->comment('');
+        $this->comment('-------------------------------------');
+        $this->comment('');
 
-		// Publish the packages.
-		$this->call('vendor:publish');
+        // Generate the Application Encryption key
+        $this->call('key:generate');
 
-		// Run the Migrations
-		$this->call('migrate');
+        // Create the migrations table
+        $this->call('migrate:install');
 
-		// Create the default user and default groups.
-		$this->sentryRunner();
+        // Publish the packages.
+        $this->call('vendor:publish');
 
-		// Seed the tables with dummy data
-		$this->call('db:seed', ['--class' => 'KitDatabaseSeeder']);
-		$this->call('db:seed');
-	}
-	/**
-	 * Asks the user for the first name.
-	 *
-	 * @return void
-	 * @todo   Use the Laravel Validator
-	 */
-	protected function askUserFirstName()
-	{
-		do
-		{
-			// Ask the user to input the first name
-			$first_name = $this->ask('Please enter your first name: ');
+        // Run the Migrations
+        $this->call('migrate');
 
-			// Check if the first name is valid
-			if ($first_name == '')
-			{
-				// Return an error message
-				$this->error('Your first name is invalid. Please try again.');
-			}
+        // Create the default user and default groups.
+        $this->sentryRunner();
 
-			// Store the user first name
-			$this->userData['first_name'] = $first_name;
-		}
-		while( ! $first_name);
-	}
+        // Seed the tables with dummy data
+        $this->call('db:seed', ['--class' => 'KitDatabaseSeeder']);
+        $this->call('db:seed');
+    }
+    /**
+     * Asks the user for the first name.
+     *
+     * @return void
+     * @todo   Use the Laravel Validator
+     */
+    protected function askUserFirstName()
+    {
+        do {
+            // Ask the user to input the first name
+            $first_name = $this->ask('Please enter your first name: ');
 
-	/**
-	 * Asks the user for the last name.
-	 *
-	 * @return void
-	 * @todo   Use the Laravel Validator
-	 */
-	protected function askUserLastName()
-	{
-		do
-		{
-			// Ask the user to input the last name
-			$last_name = $this->ask('Please enter your last name: ');
+            // Check if the first name is valid
+            if ($first_name == '') {
+            // Return an error message
+                $this->error('Your first name is invalid. Please try again.');
+            }
 
-			// Check if the last name is valid.
-			if ($last_name == '')
-			{
-				// Return an error message
-				$this->error('Your last name is invalid. Please try again.');
-			}
+            // Store the user first name
+            $this->userData['first_name'] = $first_name;
+        } while (! $first_name);
+    }
 
-			// Store the user last name
-			$this->userData['last_name'] = $last_name;
-		}
-		while( ! $last_name);
-	}
+    /**
+     * Asks the user for the last name.
+     *
+     * @return void
+     * @todo   Use the Laravel Validator
+     */
+    protected function askUserLastName()
+    {
+        do {
+            // Ask the user to input the last name
+            $last_name = $this->ask('Please enter your last name: ');
 
-	/**
-	 * Asks the user for the user email address.
-	 *
-	 * @return void
-	 * @todo   Use the Laravel Validator
-	 */
-	protected function askUserEmail()
-	{
-		do
-		{
-			// Ask the user to input the email address
-			$email = $this->ask('Please enter your user email: ');
+            // Check if the last name is valid.
+            if ($last_name == '') {
+            // Return an error message
+                $this->error('Your last name is invalid. Please try again.');
+            }
 
-			// Check if email is valid
-			if ($email == '')
-			{
-				// Return an error message
-				$this->error('Email is invalid. Please try again.');
-			}
+            // Store the user last name
+            $this->userData['last_name'] = $last_name;
+        } while (! $last_name);
+    }
 
-			// Store the email address
-			$this->userData['email'] = $email;
-		}
-		while ( ! $email);
-	}
+    /**
+     * Asks the user for the user email address.
+     *
+     * @return void
+     * @todo   Use the Laravel Validator
+     */
+    protected function askUserEmail()
+    {
+        do {
+            // Ask the user to input the email address
+            $email = $this->ask('Please enter your user email: ');
 
-	/**
-	 * Asks the user for the user password.
-	 *
-	 * @return void
-	 * @todo   Use the Laravel Validator
-	 */
-	protected function askUserPassword()
-	{
-		do
-		{
-			// Ask the user to input the user password
-			$password = $this->ask('Please enter your user password: ');
+            // Check if email is valid
+            if ($email == '') {
+            // Return an error message
+                $this->error('Email is invalid. Please try again.');
+            }
 
-			// Check if email is valid
-			if ($password == '')
-			{
-				// Return an error message
-				$this->error('Password is invalid. Please try again.');
-			}
+            // Store the email address
+            $this->userData['email'] = $email;
+        } while (! $email);
+    }
 
-			// Store the password
-			$this->userData['password'] = $password;
-		}
-		while( ! $password);
-	}
+    /**
+     * Asks the user for the user password.
+     *
+     * @return void
+     * @todo   Use the Laravel Validator
+     */
+    protected function askUserPassword()
+    {
+        do {
+            // Ask the user to input the user password
+            $password = $this->ask('Please enter your user password: ');
 
-	/**
-	 * Runs all the necessary Sentry commands.
-	 *
-	 * @return void
-	 */
-	protected function sentryRunner()
-	{
-		// Create the default groups
-		$this->sentinelCreateDefaultGroups();
+            // Check if email is valid
+            if ($password == '') {
+            // Return an error message
+                $this->error('Password is invalid. Please try again.');
+            }
 
-		// Create the user
-		$this->sentinelCreateUser();
-	}
+            // Store the password
+            $this->userData['password'] = $password;
+        } while (! $password);
+    }
 
-	/**
-	 * Creates the default groups.
-	 *
-	 * @return void
-	 */
-	protected function sentinelCreateDefaultGroups()
-	{
-		// Create the admin group
-		$group = Sentinel::getRoleRepository()->createModel()->create(array(
-			'name'        => 'Admin',
-			'slug'			=> 'admin',
-			'permissions' => array(
-				'admin' => true,
-				'users' => true
-			)
-		));
+    /**
+     * Runs all the necessary Sentry commands.
+     *
+     * @return void
+     */
+    protected function sentryRunner()
+    {
+        // Create the default groups
+        $this->sentinelCreateDefaultGroups();
 
-		// Show the success message.
-		$this->comment('');
-		$this->info('Admin group created successfully.');
-	}
+        // Create the user
+        $this->sentinelCreateUser();
+    }
 
-	/**
-	 * Create the user and associates the admin group to that user.
-	 *
-	 * @return void
-	 */
-	protected function sentinelCreateUser()
-	{
-		// Prepare the user data array.
-		$data = array_merge($this->userData, array(
-			'permissions' => array(
-				'admin' => true,
-				'user'  => true,
-			),
-		));
+    /**
+     * Creates the default groups.
+     *
+     * @return void
+     */
+    protected function sentinelCreateDefaultGroups()
+    {
+        // Create the admin group
+        $group = Sentinel::getRoleRepository()->createModel()->create(array(
+            'name'        => 'Admin',
+            'slug'          => 'admin',
+            'permissions' => array(
+                'admin' => true,
+                'users' => true
+            )
+        ));
 
-		// Create the user
-		$user = Sentinel::getUserRepository()->create($data);
+        // Show the success message.
+        $this->comment('');
+        $this->info('Admin group created successfully.');
+    }
 
-		// Associate the Admin group to this user
-		$group = Sentinel::getRoleRepository()->findById(1);
-		$group->users()->attach($user);
+    /**
+     * Create the user and associates the admin group to that user.
+     *
+     * @return void
+     */
+    protected function sentinelCreateUser()
+    {
+        // Prepare the user data array.
+        $data = array_merge($this->userData, array(
+            'permissions' => array(
+                'admin' => true,
+                'user'  => true,
+            ),
+        ));
 
-		// Activate the user
-		$activation = Activation::create($user);
-		$activation->fill([
+        // Create the user
+        $user = Sentinel::getUserRepository()->create($data);
+
+        // Associate the Admin group to this user
+        $group = Sentinel::getRoleRepository()->findById(1);
+        $group->users()->attach($user);
+
+        // Activate the user
+        $activation = Activation::create($user);
+        $activation->fill([
             'completed'    => true,
             'completed_at' => Carbon::now(),
         ]);
         $activation->save();
 
-		// Show the success message
-		$this->comment('');
-		$this->info('Your user was created successfully.');
-		$this->comment('');
-	}
+        // Show the success message
+        $this->comment('');
+        $this->info('Your user was created successfully.');
+        $this->comment('');
+    }
 }
